@@ -568,3 +568,460 @@ body {
   color: var(--accent);
   font-weight: 600;
 }
+
+/* ── Experiments Page Layout ── */
+.experiments-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Sidebar ── */
+.experiments-sidebar {
+  width: 240px;
+  min-width: 240px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.sidebar-brand:hover { color: var(--text); }
+
+.sidebar-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: all 0.18s ease;
+  cursor: pointer;
+  width: 100%;
+  background: none;
+  border: none;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-nav-item.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.sidebar-progress-box {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 8px;
+}
+
+/* ── Main Experiments Content ── */
+.experiments-main {
+  flex: 1;
+  padding: 28px 32px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* ── Experiment Card ── */
+.exp-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.exp-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.exp-card-id {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.exp-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+
+.exp-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.78rem;
+  color: var(--text-3);
+  margin-bottom: 12px;
+}
+
+.exp-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.exp-tag {
+  padding: 3px 10px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.exp-status-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.exp-status-badge.completed {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.exp-status-badge.in-progress {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.exp-status-badge.locked-badge {
+  background: var(--bg-canvas);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+/* ── Track Section ── */
+.track-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.track-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.track-section-sub {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ── Experiments Grid ── */
+.experiments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .experiments-sidebar { display: none; }
+  .experiments-main { padding: 20px 16px; }
+  .experiments-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Dashboard Layout (Experiments Page) ── */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── Sidebar Dashboard ── */
+.sidebar-dashboard {
+  width: 240px;
+  min-width: 240px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 14px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.sidebar-logo:hover { color: var(--text); text-decoration: none; }
+
+.sidebar-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: all 0.18s ease;
+  cursor: pointer;
+  width: 100%;
+  background: none;
+  border: none;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-nav-item.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.sidebar-progress-box {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 8px;
+}
+
+/* ── Main Dashboard Content ── */
+.main-content-dashboard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.dashboard-body {
+  padding: 32px 28px 48px;
+}
+
+.dashboard-header {
+  padding: 20px 28px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.dashboard-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-search-input {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 14px 8px 36px;
+  font-size: 0.85rem;
+  outline: none;
+  width: 240px;
+  transition: all 0.2s ease;
+}
+
+.dashboard-search-input::placeholder {
+  color: var(--text-3);
+}
+
+.dashboard-search-input:focus {
+  border-color: var(--accent);
+  width: 280px;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ── Experiment Card Dashboard ── */
+.experiment-card-dash {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  transition: all 0.22s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.experiment-card-dash:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+/* ── Track Heading ── */
+.track-heading {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .sidebar-dashboard { display: none; }
+  .dashboard-header { padding: 14px 16px; }
+  .dashboard-body { padding: 24px 16px 36px; }
+}
+
+/* ── Visual Lab Embed: scale down simulation to fit screen ── */
+.visual-lab-embed {
+  overflow-x: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.visual-lab-embed .horizontal-scroll-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+}
+
+.visual-lab-embed .lab-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.visual-lab-embed .channel-and-controls-wrapper {
+  margin-left: 0px !important; /* Remove the 80px shift to maximize space */
+  zoom: 0.75 !important;       /* Scale down the layout to fit screen */
+}
+
+.visual-lab-embed .table-panel {
+  zoom: 0.75 !important;       /* Scale down data table */
+}
+
+.visual-lab-embed .experiment-theory-wrapper {
+  width: 100% !important;      /* Keep theory box normal width */
+  max-width: 100% !important;
+}
+
+/* Force graph SVGs and their parent cards to scale proportionally and prevent vertical squishing */
+.visual-lab-embed .chart-card,
+.visual-lab-embed .two-bar-card {
+  height: auto !important;
+  padding: 16px !important;
+}
+
+.visual-lab-embed .chart-card .chart-svg,
+.visual-lab-embed .two-bar-card .two-bar-svg,
+.visual-lab-embed .chart-svg,
+.visual-lab-embed .two-bar-svg,
+.visual-lab-embed .graph-svg {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 700 / 400 !important;
+}
+
+/* Custom animations for the visual simulator */
+@keyframes pulse-cyan-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px var(--accent-glow), inset 0 0 4px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 12px var(--accent), inset 0 0 8px var(--accent);
+  }
+}
+
+.pulse-cyan {
+  animation: pulse-cyan-glow 2s infinite ease-in-out;
+}
+
+.animate-slider {
+  transition: opacity 0.2s ease;
+}
+.animate-slider:hover {
+  opacity: 0.9;
+}

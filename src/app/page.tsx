@@ -358,7 +358,7 @@ function HeroSection({ dict }: { dict: any }) {
 
               <motion.div variants={stagger(0.15)} className="d-flex flex-wrap gap-3">
                 <motion.a
-                  href="#curriculum"
+                  href="/experiments"
                   className="btn-primary-wiser"
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
