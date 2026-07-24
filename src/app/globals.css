@@ -23,6 +23,8 @@
   --shadow-lg: 0 16px 56px rgba(0, 0, 0, 0.12);
   --radius: 12px;
   --radius-lg: 20px;
+  --bg-card-glass: rgba(255, 255, 255, 0.8);
+  --bg-card-glass-hover: rgba(255, 255, 255, 0.9);
 }
 
 .dark-theme {
@@ -41,6 +43,8 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 16px 56px rgba(0, 0, 0, 0.65);
+  --bg-card-glass: rgba(15, 20, 25, 0.7);
+  --bg-card-glass-hover: rgba(25, 30, 35, 0.8);
 }
 
 /* ── Base ── */
@@ -801,11 +805,14 @@ body {
   display: flex;
   flex-direction: column;
   padding: 18px 14px;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  bottom: 0;
   height: 100vh;
   overflow-y: auto;
   flex-shrink: 0;
+  z-index: 50;
 }
 
 .sidebar-logo {
@@ -869,6 +876,7 @@ body {
   flex-direction: column;
   min-width: 0;
   overflow-y: auto;
+  margin-left: 240px;
 }
 
 .dashboard-body {
@@ -951,6 +959,7 @@ body {
 
 @media (max-width: 900px) {
   .sidebar-dashboard { display: none; }
+  .main-content-dashboard { margin-left: 0; }
   .dashboard-header { padding: 14px 16px; }
   .dashboard-body { padding: 24px 16px 36px; }
 }

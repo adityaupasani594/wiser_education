@@ -27,6 +27,10 @@ import B92Experiment1 from "@/components/experiments/B92Experiment1";
 import B92Experiment2 from "@/components/experiments/B92Experiment2";
 import B92Experiment3 from "@/components/experiments/B92Experiment3";
 import B92Experiment4 from "@/components/experiments/B92Experiment4";
+import QuantumBasics from "@/components/experiments/QuantumBasics";
+import "@/components/experiments/QuantumBasics.css";
+import QuantumEntanglement from "@/components/experiments/QuantumEntanglement";
+import "@/components/experiments/QuantumEntanglement.css";
 
 
 // ---------------------------------------------
@@ -797,6 +801,232 @@ function SuperdenseActivity() {
 // ---------------------------------------------
 // Dynamic Lab Component
 // ---------------------------------------------
+const TELEPORT_TOPICS = [
+  {
+    id: "entangled-source",
+    label: "Entangled Pair Share",
+    tag: "Distributing EPR resources between Alice & Bob.",
+    desc: "A maximally entangled Bell State |Φ⁺⟩ = (|00⟩+|11⟩)/√2 is pre-distributed to form the spatial quantum shortcut.",
+    longContent: {
+      kicker: "Phase 1: Quantum Entanglement Setup",
+      tagline: "Building the spatial link over remote distances.",
+      description: "Alice and Bob pre-share a pair of qubits prepared in the entangled Bell State. This entanglement serves as the information shortcut. Neither party gains information by measuring their own qubit alone, but the correlation is instantly available.",
+    }
+  },
+  {
+    id: "bell-measurement",
+    label: "Bell Measurement",
+    tag: "Alice couples the state and collapses the system.",
+    desc: "Alice applies CX and Hadamard gates to project her message state with her half of the EPR pair.",
+    longContent: {
+      kicker: "Phase 2: Joint State Projection",
+      tagline: "Destroying the original qubit state to tele-transport it.",
+      description: "Alice executes a Bell Basis Measurement. By performing a CX gate (message onto EPR qubit) followed by a Hadamard gate, she couples the systems. Measuring these qubits collapses her message state, destroying its physical copy while projecting the target values onto Bob.",
+    }
+  },
+  {
+    id: "classical-channel",
+    label: "Classical Channel",
+    tag: "Sending measurement bits at speed of light.",
+    desc: "Alice makes a classical fiber call transmitting her two bits (00, 01, 10, or 11) to Bob.",
+    longContent: {
+      kicker: "Phase 3: Classical Data Transmission",
+      tagline: "Relaying the measurement outcomes to Bob.",
+      description: "Alice transmits the two classical bits representing her measurement outcomes (00, 01, 10, or 11) over standard fiber optic cables. Because the quantum state is corrupted at Alice's terminal, the transfer is secure, and Bob must wait for this classical key to recover it.",
+    }
+  },
+  {
+    id: "unitary-correction",
+    label: "Unitary Corrections",
+    tag: "Bob rotates his qubit to reconstruct original state.",
+    desc: "Matching Alice's bits, Bob applies X and Z gates to restore the initial state with 100% fidelity.",
+    longContent: {
+      kicker: "Phase 4: Unitary State Reconstruction",
+      tagline: "Rotating the target qubit to finalize retrieval.",
+      description: "Bob receives the classical bits. Depending on Alice's measurements, Bob's qubit is in a rotated state. Bob applies conditional Pauli X and Z correction gates to rotate his qubit back into the exact initial state prepared by Alice, achieving perfect reconstruction.",
+    }
+  }
+];
+
+const DENSE_TOPICS = [
+  {
+    id: "entangled-resource",
+    label: "Entangled Sharing",
+    tag: "Starting with a Maximally Entangled EPR pair.",
+    desc: "Alice and Bob pre-share an EPR Bell State |Φ⁺⟩ linking their terminals before transmission.",
+    longContent: {
+      kicker: "Phase 1: Pre-Shared Entangled Channel",
+      tagline: "Coupling the sender and receiver terminals.",
+      description: "Superdense coding relies on a pre-shared entangled Bell State |Φ⁺⟩. This shared resource allows local changes made by Alice to instantly alter the joint state of the system, setting up the double-bit capacity expansion.",
+    }
+  },
+  {
+    id: "alice-encoding",
+    label: "Alice's Encoding",
+    tag: "Applying local rotations to map 2 classical bits.",
+    desc: "Alice applies X, Z, or identity gates to encode 00, 01, 10, or 11 onto her qubit.",
+    longContent: {
+      kicker: "Phase 2: Local Unitary Operations",
+      tagline: "Manipulating the joint state locally.",
+      description: "Alice encodes 2 classical bits by applying local operations on her qubit. She applies the Identity gate (I) for '00', Pauli X for '01', Pauli Z for '10', and X-Z for '11'. These operations map the joint system into one of the four orthogonal Bell States.",
+    }
+  },
+  {
+    id: "qubit-transit",
+    label: "Qubit Transmission",
+    tag: "Sending 1 physical qubit through the channel.",
+    desc: "Alice transmits her single encoded qubit to Bob, using only half of the physical line.",
+    longContent: {
+      kicker: "Phase 3: Quantum Channel Transit",
+      tagline: "Sending the single physical information carrier.",
+      description: "Alice sends her single physical qubit to Bob through a quantum channel. Even though only 1 physical qubit is transmitted over the wire, it contains the joint state modification, carrying the full 2 classical bits of information.",
+    }
+  },
+  {
+    id: "bell-decoding",
+    label: "Bell Basis Decoding",
+    tag: "Bob performs joint measures to decode bits.",
+    desc: "Bob measures both qubits jointly in the Bell basis to deterministically read the 2 classical bits.",
+    longContent: {
+      kicker: "Phase 4: Joint Basis Decoding",
+      tagline: "Reconstructing the encoded classical data.",
+      description: "Bob receives Alice's qubit and couples it with his pre-shared qubit. By performing a CX gate, a Hadamard gate, and measuring both in the computational basis, Bob determines which of the four Bell States was sent, decoding Alice's 2 bits.",
+    }
+  }
+];
+
+function TheoryTopicVisual({ id }: { id: string }) {
+  if (id === "entangled-source" || id === "entangled-resource") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <circle cx="110" cy="75" r="16" fill="rgba(6, 182, 212, 0.15)" stroke="#06b6d4" strokeWidth="2" />
+          <text x="110" y="79" fill="#06b6d4" fontSize="10" textAnchor="middle" fontWeight="bold">EPR</text>
+
+          <line x1="94" y1="75" x2="35" y2="75" stroke="var(--border)" strokeWidth="1.5" strokeDasharray="4 2" />
+          <line x1="126" y1="75" x2="185" y2="75" stroke="var(--border)" strokeWidth="1.5" strokeDasharray="4 2" />
+
+          <circle cx="35" cy="75" r="8" fill="#a78bfa" />
+          <text x="35" y="78" fill="#fff" fontSize="8" textAnchor="middle" fontWeight="bold">A</text>
+          <circle cx="185" cy="75" r="8" fill="#f472b6" />
+          <text x="185" y="78" fill="#fff" fontSize="8" textAnchor="middle" fontWeight="bold">B</text>
+        </svg>
+        <span className="visual-caption">Entangled State Generation (|Φ⁺⟩)</span>
+      </div>
+    );
+  }
+
+  if (id === "bell-measurement") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <line x1="20" y1="45" x2="200" y2="45" stroke="var(--border)" strokeWidth="1.5" />
+          <line x1="20" y1="95" x2="200" y2="95" stroke="var(--border)" strokeWidth="1.5" />
+          <text x="40" y="35" fill="var(--text-3)" fontSize="9">q0 (msg)</text>
+          <text x="40" y="85" fill="var(--text-3)" fontSize="9">q1 (Alice EPR)</text>
+
+          <line x1="90" y1="45" x2="90" y2="95" stroke="#06b6d4" strokeWidth="1.5" />
+          <circle cx="90" cy="45" r="4" fill="#06b6d4" />
+          <circle cx="90" cy="95" r="8" fill="none" stroke="#06b6d4" strokeWidth="1.5" />
+
+          <rect x="130" y="30" width="30" height="30" rx="4" fill="rgba(6, 182, 212, 0.1)" stroke="#06b6d4" strokeWidth="1.5" />
+          <text x="145" y="49" fill="#06b6d4" fontSize="12" fontWeight="bold" textAnchor="middle">H</text>
+        </svg>
+        <span className="visual-caption">Joint Bell Basis Measurement</span>
+      </div>
+    );
+  }
+
+  if (id === "classical-channel") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <rect x="20" y="45" width="180" height="60" rx="10" fill="rgba(255,255,255,0.02)" stroke="var(--border)" strokeWidth="1.5" />
+          <line x1="20" y1="75" x2="200" y2="75" stroke="#34d399" strokeWidth="3" strokeDasharray="10 5" />
+          <text x="110" y="80" fill="#34d399" fontSize="16" fontWeight="bold" textAnchor="middle">101100</text>
+        </svg>
+        <span className="visual-caption">Classical Transmission (Fiber Cable)</span>
+      </div>
+    );
+  }
+
+  if (id === "unitary-correction") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <line x1="20" y1="75" x2="200" y2="75" stroke="var(--border)" strokeWidth="1.5" />
+
+          <rect x="60" y="55" width="40" height="40" rx="6" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" strokeWidth="1.5" />
+          <text x="80" y="79" fill="#a78bfa" fontSize="16" fontWeight="bold" textAnchor="middle">X</text>
+
+          <rect x="120" y="55" width="40" height="40" rx="6" fill="rgba(244, 114, 182, 0.1)" stroke="#f472b6" strokeWidth="1.5" />
+          <text x="140" y="79" fill="#f472b6" fontSize="16" fontWeight="bold" textAnchor="middle">Z</text>
+        </svg>
+        <span className="visual-caption">Bob's State Recovery Actions</span>
+      </div>
+    );
+  }
+
+  if (id === "alice-encoding") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <line x1="20" y1="75" x2="200" y2="75" stroke="var(--border)" strokeWidth="1.5" />
+          <rect x="70" y="50" width="80" height="50" rx="8" fill="rgba(6, 182, 212, 0.1)" stroke="#06b6d4" strokeWidth="2" />
+          <text x="110" y="74" fill="#06b6d4" fontSize="12" fontWeight="bold" textAnchor="middle">U(b1, b2)</text>
+          <text x="110" y="90" fill="var(--text-3)" fontSize="9" textAnchor="middle">X and Z Gates</text>
+        </svg>
+        <span className="visual-caption">Alice's Unitary Encoding Operations</span>
+      </div>
+    );
+  }
+
+  if (id === "qubit-transit") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <line x1="20" y1="75" x2="200" y2="75" stroke="var(--border)" strokeWidth="1.5" strokeDasharray="4 2" />
+          <circle cx="110" cy="75" r="14" fill="rgba(167, 139, 250, 0.15)" stroke="#a78bfa" strokeWidth="2" />
+          <text x="110" y="79" fill="#a78bfa" fontSize="10" textAnchor="middle" fontWeight="bold">q (Alice)</text>
+          <path d="M 135 75 L 175 75" stroke="#a78bfa" strokeWidth="2" markerEnd="url(#transit-arrow)" />
+          <defs>
+            <marker id="transit-arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#a78bfa" />
+            </marker>
+          </defs>
+        </svg>
+        <span className="visual-caption">Single Qubit Channel Transmission</span>
+      </div>
+    );
+  }
+
+  if (id === "bell-decoding") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <line x1="20" y1="45" x2="200" y2="45" stroke="var(--border)" strokeWidth="1.5" />
+          <line x1="20" y1="95" x2="200" y2="95" stroke="var(--border)" strokeWidth="1.5" />
+
+          <line x1="60" y1="45" x2="60" y2="95" stroke="#06b6d4" strokeWidth="1.5" />
+          <circle cx="60" cy="45" r="4" fill="#06b6d4" />
+          <circle cx="60" cy="95" r="8" fill="none" stroke="#06b6d4" strokeWidth="1.5" />
+
+          <rect x="90" y="30" width="30" height="30" rx="4" fill="rgba(6, 182, 212, 0.1)" stroke="#06b6d4" strokeWidth="1.5" />
+          <text x="105" y="49" fill="#06b6d4" fontSize="12" fontWeight="bold" textAnchor="middle">H</text>
+
+          <rect x="140" y="30" width="30" height="30" rx="4" fill="rgba(255,255,255,0.02)" stroke="var(--border)" strokeWidth="1.5" />
+          <text x="155" y="49" fill="var(--text)" fontSize="12" fontWeight="bold" textAnchor="middle">M</text>
+          <rect x="140" y="80" width="30" height="30" rx="4" fill="rgba(255,255,255,0.02)" stroke="var(--border)" strokeWidth="1.5" />
+          <text x="155" y="99" fill="var(--text)" fontSize="12" fontWeight="bold" textAnchor="middle">M</text>
+        </svg>
+        <span className="visual-caption">Bell Basis Decoding Measurement</span>
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export default function LabWorkspacePage() {
   const params = useParams();
   const idStr = params.id as string; // "2.1", "2.2", "3.1", or "3.2"
@@ -814,8 +1044,8 @@ export default function LabWorkspacePage() {
   const [denseStep, setDenseStep] = useState(0);
 
   // State for Exp 2.1 (Teleportation)
-  const [theta, setTheta] = useState(60);
-  const [phi, setPhi] = useState(120);
+  const [theta, setTheta] = useState(90);
+  const [phi, setPhi] = useState(0);
   const [aliceMeasured0, setAliceMeasured0] = useState<number | null>(null);
   const [aliceMeasured1, setAliceMeasured1] = useState<number | null>(null);
   const [userXGate, setUserXGate] = useState(false);
@@ -1543,13 +1773,21 @@ ${svgCircuit}
 
 
 
+  if (idStr === "1.1") {
+    return <QuantumBasics dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
+  }
+
+  if (idStr === "1.2") {
+    return <QuantumEntanglement dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
+  }
+
   if (idStr === "3.1") {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
         <nav className="wiser-nav scrolled" style={{ position: "sticky" }}>
           <div className="container-xl d-flex align-items-center justify-content-between">
             <Link href="/experiments" className="d-flex align-items-center gap-2" style={{ textDecoration: "none", color: "var(--text)" }}>
-              <ArrowLeft size={16} /><span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Exit Workspace</span>
+              <ArrowLeft size={16} /><span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Exit</span>
             </Link>
             <div className="d-flex align-items-center gap-3">
               <button className="theme-toggle" onClick={() => setDark(!dark)} style={{ width: 44, height: 22 }}>
@@ -1949,7 +2187,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
         <nav className="wiser-nav scrolled" style={{ position: "sticky" }}>
           <div className="container-xl d-flex align-items-center justify-content-between">
             <Link href="/experiments" className="d-flex align-items-center gap-2" style={{ textDecoration: "none", color: "var(--text)" }}>
-              <ArrowLeft size={16} /><span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Exit Workspace</span>
+              <ArrowLeft size={16} /><span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Exit</span>
             </Link>
             <div className="d-flex align-items-center gap-3">
               <button className="theme-toggle" onClick={() => setDark(!dark)} style={{ width: 44, height: 22 }}>
@@ -2317,48 +2555,41 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
       {/* Top Navigation */}
-      <nav className="wiser-nav scrolled" style={{ position: "sticky" }}>
-        <div className="container-xl d-flex align-items-center justify-content-between">
+      <nav className="wiser-nav scrolled" style={{ position: "sticky", top: 0, zIndex: 1000 }}>
+        <div className="container-xl d-flex align-items-center justify-content-between" style={{ padding: "14px 20px" }}>
           <Link href="/experiments" className="d-flex align-items-center gap-2" style={{ textDecoration: "none", color: "var(--text)" }}>
             <ArrowLeft size={16} />
-            <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Exit Workspace</span>
+            <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Exit</span>
           </Link>
 
-          <div className="d-flex align-items-center gap-3">
-            {/* Theme Toggle */}
-            <button className="theme-toggle" onClick={() => setDark(!dark)} style={{ width: 44, height: 22 }}>
-              <div
-                className="theme-toggle-thumb"
-                style={{
-                  width: 16, height: 16, borderRadius: "50%",
-                  transform: `translateX(${dark ? "22px" : "2px"})`,
-                  background: dark ? "var(--accent)" : "#fbbf24",
-                  display: "flex", alignItems: "center", justifyContent: "center"
-                }}
+          {/* PERSISTENT SUB-NAV FOR MODES */}
+          <div className="builder-tab-nav" style={{ display: "flex", gap: 8 }}>
+            {[
+              { id: "theory", label: "1. Theory Dashboard" },
+              { id: "visual", label: "2. Visual Lab" },
+              { id: "activity", label: "3. Interactive Activity" },
+              { id: "sandbox", label: "4. Qiskit Sandbox" },
+              { id: "quiz", label: "5. Checkpoint Quiz" },
+              { id: "report", label: "6. Report & Credentials" }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`builder-tab-btn ${activeTab === tab.id ? "active" : ""}`}
               >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="d-flex align-items-center gap-3">
+            <button className="theme-toggle" onClick={() => setDark(!dark)} style={{ width: 44, height: 22 }}>
+              <div className="theme-toggle-thumb" style={{ width: 16, height: 16, borderRadius: "50%", transform: `translateX(${dark ? "22px" : "2px"})`, background: dark ? "var(--accent)" : "#fbbf24", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {dark ? <Moon size={8} color="#fff" /> : <Sun size={8} color="#fff" />}
               </div>
             </button>
-
-            {/* Language Selector */}
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value as LangCode)}
-              style={{
-                fontSize: "0.75rem",
-                background: "var(--bg-canvas)",
-                border: "1px solid var(--border)",
-                color: "var(--text)",
-                borderRadius: 6,
-                padding: "4px 8px",
-                outline: "none"
-              }}
-            >
-              {(Object.keys(LANG_META) as LangCode[]).map((key) => (
-                <option key={key} value={key}>
-                  {LANG_META[key].flag} {LANG_META[key].label}
-                </option>
-              ))}
+            <select value={lang} onChange={(e) => setLang(e.target.value as LangCode)} style={{ fontSize: "0.75rem", background: "var(--bg-canvas)", border: "1px solid var(--border)", color: "var(--text)", borderRadius: 6, padding: "4px 8px", outline: "none" }}>
+              {(Object.keys(LANG_META) as LangCode[]).map((key) => (<option key={key} value={key}>{LANG_META[key].flag} {LANG_META[key].label}</option>))}
             </select>
           </div>
         </div>
@@ -2366,54 +2597,9 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
 
       {/* Main Container */}
       <div className="container-xl py-4" style={{ maxWidth: 1040 }}>
-        {/* Lab Header */}
-        <header className="mb-4">
-          <span style={{ fontSize: "0.72rem", color: "var(--accent)", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-            Communication Channel Lab • Experiment {idStr}
-          </span>
-          <h2 className="font-display" style={{ fontSize: "1.8rem", fontWeight: 700, margin: "4px 0 12px 0" }}>
-            {isTeleport ? "Quantum Teleportation Protocol" : "Superdense Coding Protocol"}
-          </h2>
-
-          {/* Workflow Stepper Navigation Tabs */}
-          <div className="d-flex gap-2 overflow-x-auto pb-2" style={{ borderBottom: "1px solid var(--border)" }}>
-            {[
-              { id: "theory", label: "1. Theory ", icon: <BookOpen size={16} /> },
-              { id: "visual", label: "2. Visual Lab", icon: <Compass size={16} /> },
-              { id: "activity", label: "3. Interactive Activity", icon: <Sparkles size={16} /> },
-              { id: "sandbox", label: "4. Qiskit Sandbox", icon: <Cpu size={16} /> },
-              { id: "quiz", label: "5. Checkpoint Quiz", icon: <HelpCircle size={16} /> },
-              { id: "report", label: "6. Report & Credentials", icon: <FileText size={16} /> }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                style={{
-                  padding: "10px 16px",
-                  background: activeTab === tab.id ? "var(--bg-card)" : "transparent",
-                  border: "1px solid",
-                  borderColor: activeTab === tab.id ? "var(--border)" : "transparent",
-                  borderBottomColor: activeTab === tab.id ? "var(--bg)" : "transparent",
-                  color: activeTab === tab.id ? "var(--accent)" : "var(--text-3)",
-                  borderRadius: "8px 8px 0 0",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  whiteSpace: "nowrap",
-                  marginBottom: -1
-                }}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </header>
 
         {/* Tab Content Display */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: 32, minHeight: 400 }}>
+        <div style={{ minHeight: 400 }}>
           <AnimatePresence mode="wait">
             {activeTab === "theory" && (
               <motion.div
@@ -2421,72 +2607,181 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
+                className="learn-page qx-page"
+                style={{ background: "transparent", border: "none", padding: 0 }}
               >
-                <h3 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 16 }}>Foundational Principles</h3>
-
-                {isTeleport ? (
-                  <div>
-                    <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
-                      🚀 Quantum Teleportation: Beam Information, Not Matter!
-                    </h4>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>
-                      Imagine you want to send a secret quantum message to a friend across the world. You cannot make a copy of your message to mail them (because of the <strong>No-Cloning Theorem</strong>). But if you both share an <strong>entangled pair of twin particles</strong>, you can perform a clever trick!
+                {/* HERO SECTION */}
+                <section className="learn-hero" style={{ minHeight: "auto", padding: "40px 0 60px 0" }}>
+                  <div className="learn-hero-inner" style={{ maxWidth: "100%" }}>
+                    <p className="learn-pill">
+                      {isTeleport ? "Experiment 2.1: Quantum Teleportation Protocol" : "Experiment 2.2: Superdense Coding Protocol"}
+                    </p>
+                    <h1>
+                      {isTeleport ? "Teleport States, Not Matter." : "Double Channel Capacity with Entanglement."}
+                    </h1>
+                    <p className="learn-hero-sub">
+                      {isTeleport
+                        ? "Discover how to transfer an arbitrary unknown quantum state from Alice to Bob using a pre-shared entangled EPR pair and only two bits of classical communication."
+                        : "Learn how to transmit two classical bits of information by physically sending only a single qubit, leveraging pre-shared entanglement to double channel capacity."
+                      }
                     </p>
 
-                    <div style={{ background: "rgba(6, 182, 212, 0.08)", borderLeft: "4px solid var(--accent)", padding: 18, borderRadius: 8, margin: "20px 0" }}>
-                      <h5 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
-                        🎲 The Magic Twin Dice Analogy
-                      </h5>
-                      <p style={{ fontSize: "0.88rem", lineHeight: 1.6, color: "var(--text-2)", margin: 0 }}>
-                        Think of entanglement like a pair of magic twin dice. No matter how far apart Alice and Bob are, their twin dice are mysteriously linked. When Alice rolls her secret message die together with her twin die, her original secret message collapses. But by calling Bob on a regular phone and telling him her 2 measurement numbers (00, 01, 10, or 11), Bob can rotate his twin die to instantly recreate Alice's exact original secret message!
-                      </p>
+                    <div className="learn-hero-buttons">
+                      <button
+                        className="learn-cta-primary"
+                        onClick={() => {
+                          const element = document.getElementById(isTeleport ? "entangled-source" : "entangled-resource");
+                          if (element) element.scrollIntoView({ behavior: "smooth" });
+                        }}
+                      >
+                        Start Learning &rarr;
+                      </button>
+                      <button
+                        className="learn-cta-secondary"
+                        onClick={() => setActiveTab("visual")}
+                      >
+                        Launch Visual Lab
+                      </button>
                     </div>
 
-                    <h5 style={{ fontSize: "1rem", fontWeight: 700, margin: "24px 0 12px 0", color: "var(--text)" }}>
-                      The 4 Simple Steps of Teleportation
-                    </h5>
-                    <ol style={{ fontSize: "0.92rem", lineHeight: 1.8, color: "var(--text-2)" }}>
-                      <li><strong>Share Entanglement:</strong> A central source generates a Bell pair |Φ⁺⟩ and gives 1 particle to Alice and 1 to Bob.</li>
-                      <li><strong>Alice's Measurement:</strong> Alice measures her secret qubit together with her entangled particle. This collapses her original qubit.</li>
-                      <li><strong>Classical Phone Call:</strong> Alice transmits 2 normal classical bits (00, 01, 10, or 11) over an optical fiber.</li>
-                      <li><strong>Bob's Tuning:</strong> Bob applies simple flip gates (X and Z) matching Alice's bits to recreate Alice's original state.</li>
-                    </ol>
-
-                    <div style={{ background: "rgba(251, 191, 36, 0.08)", borderLeft: "4px solid #fbbf24", padding: 16, borderRadius: 8, marginTop: 20 }}>
-                      <p style={{ fontSize: "0.88rem", lineHeight: 1.6, color: "var(--text-2)", margin: 0 }}>
-                        <strong>⚡ Why This Doesn't Break Light Speed:</strong> Even though entanglement is instant, Bob cannot decode the message until Alice's classical phone call arrives at the speed of light.
-                      </p>
+                    <div className="learn-hero-grid">
+                      {isTeleport ? (
+                        <>
+                          <div className="learn-hero-card">
+                            <h3>No-Cloning Bypass</h3>
+                            <p>Bypasses the no-cloning restriction by destroying Alice's original qubit while Bob reconstructs it remote-side.</p>
+                          </div>
+                          <div className="learn-hero-card">
+                            <h3>Pre-Shared Link</h3>
+                            <p>Uses a maximally entangled Bell pair to link remote terminals through quantum correlation channels.</p>
+                          </div>
+                          <div className="learn-hero-card">
+                            <h3>Classical Key</h3>
+                            <p>Requires Alice's two classical measurement bits to select the matching unitary corrections at Bob's side.</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="learn-hero-card">
+                            <h3>Superdense Capacity</h3>
+                            <p>Transmits two bits of classical data in a single physical qubit, achieving a 2:1 channel capacity boost.</p>
+                          </div>
+                          <div className="learn-hero-card">
+                            <h3>Pre-Shared EPR</h3>
+                            <p>Utilizes shared entanglement to map local operations to four distinct joint states.</p>
+                          </div>
+                          <div className="learn-hero-card">
+                            <h3>Bell Decoding</h3>
+                            <p>Bob measures both qubits jointly in the Bell basis to deterministically read Alice's message.</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
-                ) : (
-                  <div>
-                    <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
-                      ✉️ Superdense Coding: 2 Secret Messages in 1 Physical Qubit!
-                    </h4>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>
-                      In classical computing, sending 2 bits of data requires sending 2 physical signals. Superdense coding allows Alice to send <strong>2 classical bits (00, 01, 10, or 11)</strong> by sending only <strong>1 physical qubit</strong>, leveraging pre-shared entanglement!
-                    </p>
+                </section>
 
-                    <div style={{ background: "rgba(167, 139, 250, 0.08)", borderLeft: "4px solid #a78bfa", padding: 18, borderRadius: 8, margin: "20px 0" }}>
-                      <h5 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
-                        📬 The Pre-Addressed Envelope Analogy
-                      </h5>
-                      <p style={{ fontSize: "0.88rem", lineHeight: 1.6, color: "var(--text-2)", margin: 0 }}>
-                        Because Alice and Bob already share an entangled ribbon (Bell Pair), Alice only needs to tweak her end of the ribbon and send her 1 single qubit to Bob. When Bob receives it, he measures both ends together and decodes all 2 classical bits!
-                      </p>
+                {/* TOPICS CARD SECTION */}
+                <section className="learn-topics" style={{ padding: "60px 0" }}>
+                  <div className="learn-topics-header">
+                    <h2>Core Principles of the Protocol</h2>
+                    <p>Click on any concept card below to quickly scroll to its detailed visualizer widget.</p>
+                  </div>
+
+                  <div className="learn-cards-grid">
+                    {(isTeleport ? TELEPORT_TOPICS : DENSE_TOPICS).map((topic) => (
+                      <button
+                        key={topic.id}
+                        className="learn-card"
+                        onClick={() => {
+                          const element = document.getElementById(topic.id);
+                          if (element) element.scrollIntoView({ behavior: "smooth" });
+                        }}
+                      >
+                        <div className="learn-card-visual-placeholder">
+                          <TheoryTopicVisual id={topic.id} />
+                        </div>
+                        <div className="learn-card-body">
+                          <h3>{topic.label}</h3>
+                          <p>{topic.tag}</p>
+                          <span className="learn-card-link">Explore Details &rarr;</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                {/* LONG SCROLL SECTIONS */}
+                {(isTeleport ? TELEPORT_TOPICS : DENSE_TOPICS).map((topic, index) => (
+                  <section
+                    key={topic.id}
+                    id={topic.id}
+                    className={`learn-section ${index % 2 === 1 ? "learn-section-reverse" : ""}`}
+                    style={{ margin: "80px 0" }}
+                  >
+                    <div className="learn-section-text">
+                      <span className="learn-section-kicker">{topic.longContent.kicker}</span>
+                      <h2>{topic.label}</h2>
+                      <p className="learn-section-tagline">{topic.longContent.tagline}</p>
+                      <p className="learn-section-description">{topic.longContent.description}</p>
+
+                      {topic.id === "alice-encoding" && (
+                        <div className="learn-basis-table" style={{ marginTop: 16 }}>
+                          <h4>Superdense Encoding Map</h4>
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Bits to Send</th>
+                                <th>Unitary Operation</th>
+                                <th>Encoded State</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td><strong>00</strong></td>
+                                <td>Identity (I)</td>
+                                <td>|Φ⁺⟩ = (|00⟩ + |11⟩)/√2</td>
+                              </tr>
+                              <tr>
+                                <td><strong>01</strong></td>
+                                <td>Pauli X</td>
+                                <td>|Ψ⁺⟩ = (|01⟩ + |10⟩)/√2</td>
+                              </tr>
+                              <tr>
+                                <td><strong>10</strong></td>
+                                <td>Pauli Z</td>
+                                <td>|Φ⁻⟩ = (|00⟩ - |11⟩)/√2</td>
+                              </tr>
+                              <tr>
+                                <td><strong>11</strong></td>
+                                <td>Pauli X & Z</td>
+                                <td>|Ψ⁻⟩ = (|01⟩ - |10⟩)/√2</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
 
-                    <h5 style={{ fontSize: "1rem", fontWeight: 700, margin: "24px 0 12px 0", color: "var(--text)" }}>
-                      How Alice Encodes Her 2 Bits
-                    </h5>
-                    <ul style={{ fontSize: "0.92rem", lineHeight: 1.8, color: "var(--text-2)" }}>
-                      <li><strong>To send "00":</strong> Do nothing (Identity gate I). State stays |Φ⁺⟩.</li>
-                      <li><strong>To send "01":</strong> Flip bit (Pauli X gate). State becomes |Ψ⁺⟩.</li>
-                      <li><strong>To send "10":</strong> Flip phase (Pauli Z gate). State becomes |Φ⁻⟩.</li>
-                      <li><strong>To send "11":</strong> Flip both bit &amp; phase (X and Z gates). State becomes |Ψ⁻⟩.</li>
-                    </ul>
+                    <div className="learn-section-visual">
+                      <div className="learn-section-visual-box">
+                        <TheoryTopicVisual id={topic.id} />
+                      </div>
+                    </div>
+                  </section>
+                ))}
+
+                {/* FINAL CTA */}
+                <section className="learn-final-cta" style={{ padding: "60px 0" }}>
+                  <div className="learn-final-inner">
+                    <h2>Theory Complete!</h2>
+                    <p>Proceed to the visual simulator workspace to execute the operations step-by-step.</p>
+                    <div className="learn-final-buttons">
+                      <button className="learn-cta-primary" onClick={() => setActiveTab("visual")}>
+                        Go to Visual Lab
+                      </button>
+                    </div>
                   </div>
-                )}
+                </section>
               </motion.div>
             )}
 
@@ -2520,20 +2815,14 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                         {teleportStep === 0 && (
                           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                             <p style={{ fontSize: "0.82rem", color: "var(--text-2)", lineHeight: 1.5, margin: 0 }}>
-                              Choose the quantum state vector to be teleported. The Bloch sphere vector will dynamically adjust below.
+                              For this demonstration, the quantum state vector to be teleported is fixed to the superposition state:
                             </p>
-                            <div>
-                              <div className="d-flex justify-content-between mb-1" style={{ fontSize: "0.8rem", fontWeight: 600 }}>
-                                <span>Polar angle (&theta;): {theta}&deg;</span>
+                            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 12, fontSize: "0.82rem" }}>
+                              <div style={{ fontWeight: 700, color: "var(--accent)" }}>Demonstration State: |+⟩</div>
+                              <div style={{ color: "var(--text-3)", marginTop: 4 }}>
+                                Polar angle (&theta;) = 90&deg;<br />
+                                Azimuthal angle (&phi;) = 0&deg;
                               </div>
-                              <input type="range" min="0" max="180" value={theta} onChange={e => setTheta(Number(e.target.value))} className="w-100 animate-slider" />
-                            </div>
-
-                            <div>
-                              <div className="d-flex justify-content-between mb-1" style={{ fontSize: "0.8rem", fontWeight: 600 }}>
-                                <span>Azimuthal angle (&phi;): {phi}&deg;</span>
-                              </div>
-                              <input type="range" min="0" max="360" value={phi} onChange={e => setPhi(Number(e.target.value))} className="w-100 animate-slider" />
                             </div>
 
                             <button className="btn-primary-wiser w-100" onClick={() => setTeleportStep(1)} style={{ marginTop: 8 }}>
@@ -2731,25 +3020,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                             </>
                           )}
                         </div>
-                        <div className="row text-center mb-2 g-2">
-                          <div className="col-6">
-                            <p style={{ fontSize: "0.72rem", color: "var(--text-3)", marginBottom: 6, fontWeight: 700, letterSpacing: "0.08em" }}>ALICE'S INPUT |ψ⟩</p>
-                            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 12 }}>
-                              <div style={{ fontFamily: "monospace", fontSize: "0.85rem", color: "var(--accent)", fontWeight: 700 }}>
-                                {alpha.toFixed(2)}|0⟩ + ({betaReal.toFixed(2)} {betaImag >= 0 ? "+" : ""} {betaImag.toFixed(2)}i)|1⟩
-                              </div>
-                            </div>
-                          </div>
 
-                          <div className="col-6">
-                            <p style={{ fontSize: "0.72rem", color: "var(--text-3)", marginBottom: 6, fontWeight: 700, letterSpacing: "0.08em" }}>BOB'S RECEIVED STATE</p>
-                            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 12 }}>
-                              <div style={{ fontFamily: "monospace", fontSize: "0.85rem", color: "#a78bfa", fontWeight: 700 }}>
-                                {bobAlpha.toFixed(2)}|0⟩ + ({bobBetaReal.toFixed(2)} {bobBetaImag >= 0 ? "+" : ""} {bobBetaImag.toFixed(2)}i)|1⟩
-                              </div>
-                            </div>
-                          </div>
-                        </div>
 
                         {/* State Vector comparison */}
                         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 14, fontSize: "0.82rem", textAlign: "center" }}>
@@ -2791,34 +3062,11 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                         {denseStep === 0 && (
                           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                             <p style={{ fontSize: "0.82rem", color: "var(--text-2)", lineHeight: 1.5, margin: 0 }}>
-                              Select the 2-bit classical message Alice wishes to transmit to Bob using only one physical qubit.
+                              For this demonstration, the 2-bit classical message Alice wishes to transmit is fixed:
                             </p>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                              {["00", "01", "10", "11"].map(bits => (
-                                <button
-                                  key={bits}
-                                  onClick={() => {
-                                    setDenseBits(bits);
-                                    setBobMeasuredBits(null);
-                                    setDenseUserXGate(false);
-                                    setDenseUserZGate(false);
-                                  }}
-                                  style={{
-                                    padding: 12,
-                                    background: denseBits === bits ? "var(--accent)" : "var(--bg-card)",
-                                    color: denseBits === bits ? "#fff" : "var(--text-2)",
-                                    border: "1px solid var(--border)",
-                                    borderRadius: 10,
-                                    fontWeight: 700,
-                                    fontSize: "1rem",
-                                    cursor: "pointer",
-                                    transition: "all 0.2s ease"
-                                  }}
-                                >
-                                  {bits}
-                                </button>
-                              ))}
+                            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 16, textAlign: "center" }}>
+                              <span style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--accent)" }}>11</span>
                             </div>
                             <button className="btn-primary-wiser w-100" onClick={() => setDenseStep(1)} style={{ marginTop: 8 }}>
                               Initialize EPR Pair (Step 2) &rarr;

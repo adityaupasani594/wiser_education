@@ -160,7 +160,7 @@ export default function ExperimentsHome() {
             </Link>
           </li>
           <li>
-            <button 
+            <button
               className={`sidebar-nav-item w-100 text-start ${selectedTrack === null ? "active" : ""}`}
               onClick={() => setSelectedTrack(null)}
               style={{ border: "none", background: "none" }}
@@ -195,13 +195,13 @@ export default function ExperimentsHome() {
             </span>
           </div>
           <div className="progress" style={{ height: 6, background: "var(--border)", borderRadius: 99 }}>
-            <div 
-              className="progress-bar" 
-              style={{ 
-                width: `${progressPercent}%`, 
+            <div
+              className="progress-bar"
+              style={{
+                width: `${progressPercent}%`,
                 background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
                 borderRadius: 99
-              }} 
+              }}
             />
           </div>
           <p style={{ fontSize: "0.68rem", color: "var(--text-3)", marginTop: 8, margin: 0 }}>
@@ -298,14 +298,14 @@ export default function ExperimentsHome() {
               <section key={t.id}>
                 <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
                   <div className="track-heading" style={{ marginBottom: 0 }}>
-                    <div 
-                      className="d-flex align-items-center justify-content-center" 
-                      style={{ 
-                        width: 32, 
-                        height: 32, 
-                        borderRadius: 8, 
-                        background: `${t.color}15`, 
-                        color: t.color 
+                    <div
+                      className="d-flex align-items-center justify-content-center"
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 8,
+                        background: `${t.color}15`,
+                        color: t.color
                       }}
                     >
                       {t.icon}
@@ -319,12 +319,12 @@ export default function ExperimentsHome() {
                   </div>
 
                   <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                    <Link 
+                    <Link
                       href={`/experiments/track/${t.id}`}
                       className="btn-secondary-wiser"
-                      style={{ 
-                        fontSize: "0.78rem", 
-                        padding: "8px 16px", 
+                      style={{
+                        fontSize: "0.78rem",
+                        padding: "8px 16px",
                         textDecoration: "none",
                         borderColor: `${t.color}40`,
                         color: t.color
@@ -351,27 +351,27 @@ export default function ExperimentsHome() {
                         >
                           {/* Top row metadata */}
                           <div className="d-flex justify-content-between align-items-center mb-3">
-                            <span 
-                              style={{ 
-                                fontFamily: "Paper, monospace", 
-                                fontSize: "0.78rem", 
+                            <span
+                              style={{
+                                fontFamily: "Paper, monospace",
+                                fontSize: "0.78rem",
                                 fontWeight: 700,
-                                color: t.color 
+                                color: t.color
                               }}
                             >
                               Exp {exp.id}
                             </span>
 
                             {/* Status Pill */}
-                            <span 
-                              className="tag-pill" 
-                              style={{ 
+                            <span
+                              className="tag-pill"
+                              style={{
                                 background: isCompleted ? "rgba(52, 211, 153, 0.1)" : isInProgress ? `${t.color}15` : "var(--bg-canvas)",
                                 color: isCompleted ? "#34d399" : isInProgress ? t.color : "var(--text-3)",
-                                border: isCompleted 
-                                  ? "1px solid rgba(52, 211, 153, 0.2)" 
-                                  : isInProgress 
-                                    ? `1px solid ${t.color}30` 
+                                border: isCompleted
+                                  ? "1px solid rgba(52, 211, 153, 0.2)"
+                                  : isInProgress
+                                    ? `1px solid ${t.color}30`
                                     : "1px solid var(--border)",
                                 fontSize: "0.6rem"
                               }}
@@ -407,12 +407,12 @@ export default function ExperimentsHome() {
                           {/* Concepts tags */}
                           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 24 }}>
                             {exp.concepts.slice(0, 3).map((c) => (
-                              <span 
-                                key={c} 
-                                className="tag-pill" 
-                                style={{ 
-                                  background: "var(--bg-canvas)", 
-                                  color: "var(--text-2)", 
+                              <span
+                                key={c}
+                                className="tag-pill"
+                                style={{
+                                  background: "var(--bg-canvas)",
+                                  color: "var(--text-2)",
                                   border: "1px solid var(--border)",
                                   fontSize: "0.58rem"
                                 }}
@@ -425,7 +425,7 @@ export default function ExperimentsHome() {
                           {/* Action Button */}
                           <div style={{ marginTop: "auto" }}>
                             {isLocked ? (
-                              <button 
+                              <button
                                 className="btn-secondary-wiser w-100 d-flex align-items-center justify-content-center gap-2"
                                 style={{ opacity: 0.6, cursor: "not-allowed", fontSize: "0.82rem" }}
                                 disabled
@@ -435,7 +435,7 @@ export default function ExperimentsHome() {
                               </button>
                             ) : (
                               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                <Link 
+                                <Link
                                   href={`/experiments/lab/${exp.id}`}
                                   className="btn-primary-wiser w-100 d-flex align-items-center justify-content-center gap-2"
                                   style={{ textDecoration: "none", fontSize: "0.82rem" }}
