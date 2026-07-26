@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import "./QuantumEntanglement.css";
-import { ArrowLeft, BookOpen, Sparkles, HelpCircle, RotateCcw, Trash2, ChevronRight, ChevronLeft, X, AlertCircle, CheckCircle2, ArrowRight, Moon, Sun, Award, FileText, Check, Download, FlaskConical, Cpu } from "lucide-react";
+import { ArrowLeft, BookOpen, Sparkles, HelpCircle, RotateCcw, Trash2, ChevronRight, ChevronLeft, X, AlertCircle, CheckCircle2, ArrowRight, Moon, Sun, Award, FileText, Check, Download, FlaskConical, Cpu, Play } from "lucide-react";
 import Link from "next/link";
 import { LANG_META } from "../../data/translations";
 import { TRANSLATIONS_EXP_1_2 } from "../../data/translations_exp_1.2";
+import { COLAB_LINKS } from "../../data/colabLinks";
 
 const QUIZ_ANSWERS = [0, 1, 1, 2, 1, 1, 2, 3, 1, 2];
 
@@ -626,7 +627,7 @@ function Interactive3DBlochSphere({ x = 0, y = 0, z = 1, label = "|ψ⟩" }) {
 // -------------------------------------------------------------------
 // MAIN EXPORTS COMPONENT
 // -------------------------------------------------------------------
-export default function QuantumEntanglement({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { } } = {}) {
+export default function QuantumEntanglement({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { }, onQuizPassed = () => { } } = {}) {
   const dict = TRANSLATIONS_EXP_1_2[lang] || TRANSLATIONS_EXP_1_2.en;
 
   const topics = [
@@ -670,6 +671,37 @@ export default function QuantumEntanglement({ dark = true, setDark = (val) => { 
   ];
 
   const [view, setView] = useState("learn"); // "learn", "builder", "activity", or "quiz"
+  const [copied, setCopied] = useState(false);
+  const entanglementQiskitCode = `from qiskit import QuantumCircuit, Aer, execute
+
+# 1. Initialize a 2-qubit circuit and 2 classical bits
+qc = QuantumCircuit(2, 2)
+
+# 2. Put qubit 0 into superposition (|0> + |1>)/√2 using Hadamard gate
+qc.h(0)
+
+# 3. Entangle qubit 1 with qubit 0 using a Controlled-NOT (CNOT) gate
+qc.cx(0, 1)
+
+# 4. Measure both qubits into the classical bits
+qc.measure([0, 1], [0, 1])
+
+# 5. Execute the circuit on the simulator
+simulator = Aer.get_backend('qasm_simulator')
+job = execute(qc, simulator, shots=1024)
+result = job.result()
+
+# 6. Output the measurement results (we expect only '00' and '11')
+counts = result.get_counts(qc)
+print("Measurement counts (Bell state Φ+):", counts)
+`;
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(entanglementQiskitCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const [activeTopic, setActiveTopic] = useState(null);
 
   // 3 Qubits Playground Wires
@@ -863,7 +895,11 @@ export default function QuantumEntanglement({ dark = true, setDark = (val) => { 
     } else {
       setQuizSubmitted(true);
       const finalScore = quizScore;
-      setQuizPassed(finalScore === quizQuestions.length);
+      const passed = finalScore === quizQuestions.length;
+      setQuizPassed(passed);
+      if (passed) {
+        onQuizPassed();
+      }
     }
   };
 
@@ -1297,6 +1333,12 @@ ${circuitHtml}
             </button>
             <button className={`builder-tab-btn ${view === "activity" ? "active" : ""}`} onClick={() => setView("activity")}>
               {dict.nav_activities}
+            </button>
+            <button
+              className={`builder-tab-btn ${view === "sandbox" ? "active" : ""}`}
+              onClick={() => setView("sandbox")}
+            >
+              Qiskit Sandbox
             </button>
             <button className={`builder-tab-btn ${view === "quiz" ? "active" : ""}`} onClick={() => setView("quiz")}>
               {dict.nav_quiz}
@@ -2327,6 +2369,77 @@ ${circuitHtml}
                 {dict.btn_back_dashboard || "← Back to Experiments"}
               </Link>
             </div>
+          </section>
+        </div>
+      )}      {/* RENDER MODE: QISKIT SANDBOX */}
+      {view === "sandbox" && (
+        <div className="view-fade-in" style={{ padding: "40px 0 80px" }}>
+          <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px" }}>
+            <div className="d-flex justify-content-between align-items-center mb-16 flex-wrap gap-2" style={{ marginBottom: 24 }}>
+              <div>
+                <h3 style={{ fontSize: "1.5rem", fontWeight: 800, margin: 0, color: "var(--text)" }}>Qiskit Sandbox</h3>
+                <p style={{ fontSize: "0.87rem", color: "var(--text-3)", marginTop: 4, margin: 0 }}>
+                  Copy this Qiskit code to run it locally or inside Google Colab.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <a
+                  href={COLAB_LINKS["1.2"]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary-wiser"
+                  style={{
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 16px",
+                    fontSize: "0.8rem",
+                    borderRadius: 6,
+                    fontWeight: 600
+                  }}
+                >
+                  <Play size={12} /> Open in Colab
+                </a>
+                <button
+                  onClick={handleCopyCode}
+                  className="btn-secondary-wiser"
+                  style={{
+                    padding: "8px 16px",
+                    fontSize: "0.8rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text)",
+                    borderRadius: 6,
+                    cursor: "pointer"
+                  }}
+                >
+                  {copied ? <CheckCircle2 size={14} style={{ color: "#34d399" }} /> : <Cpu size={14} />}
+                  {copied ? "Copied!" : "Copy Code"}
+                </button>
+              </div>
+            </div>
+
+            <pre
+              style={{
+                background: "var(--bg-canvas)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: 20,
+                fontFamily: "monospace",
+                fontSize: "0.85rem",
+                color: "var(--accent)",
+                overflowX: "auto",
+                maxHeight: 500,
+                lineHeight: 1.6
+              }}
+            >
+              {entanglementQiskitCode}
+            </pre>
           </section>
         </div>
       )}

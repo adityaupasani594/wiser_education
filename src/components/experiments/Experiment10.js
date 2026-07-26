@@ -564,7 +564,7 @@ function KeyLengthStagesGraph({
       <div className="experiment-theory-wrapper">
         <div className="experiment-theory-box" role="region" aria-label="Experiment 7 theory">
           <div className="theory-top">
-            <h2 className="theory-title"><h2>Experiment 10 — Authentication Attack (Man-in-the-Middle in BB84)</h2></h2>
+            <h2 className="theory-title">Experiment 10 — Authentication Attack (Man-in-the-Middle in BB84)</h2>
           </div>
 
           <div className="theory-body">

@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import "./QuantumBasics.css";
-import { ArrowLeft, BookOpen, Sparkles, HelpCircle, RotateCcw, Trash2, ChevronRight, ChevronLeft, X, AlertCircle, CheckCircle2, ArrowRight, Moon, Sun, Award, FileText, Download, FlaskConical, Cpu } from "lucide-react";
+import { ArrowLeft, BookOpen, Sparkles, HelpCircle, RotateCcw, Trash2, ChevronRight, ChevronLeft, X, AlertCircle, CheckCircle2, ArrowRight, Moon, Sun, Award, FileText, Download, FlaskConical, Cpu, Play } from "lucide-react";
 import Link from "next/link";
 import { LANG_META } from "../../data/translations";
 import { TRANSLATIONS_EXP_1_1 } from "../../data/translations_exp_1.1";
+import { COLAB_LINKS } from "../../data/colabLinks";
 
 const QUIZ_ANSWERS = [1, 2, 1, 2, 1, 1, 2, 2, 0, 0];
 
@@ -473,7 +474,7 @@ function LiveBlochSphere({ state }) {
 // -------------------------------------------------------------------
 // MAIN EXPORTS COMPONENT
 // -------------------------------------------------------------------
-export default function QuantumBasics({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { } } = {}) {
+export default function QuantumBasics({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { }, onQuizPassed = () => { } } = {}) {
   const dict = TRANSLATIONS_EXP_1_1[lang] || TRANSLATIONS_EXP_1_1.en;
 
   const topics = [
@@ -537,6 +538,34 @@ export default function QuantumBasics({ dark = true, setDark = (val) => { }, lan
   }));
 
   const [view, setView] = useState("learn"); // "learn", "builder", or "quiz"
+  const [copied, setCopied] = useState(false);
+  const basicsQiskitCode = `from qiskit import QuantumCircuit, Aer, execute
+
+# 1. Initialize a 1-qubit circuit and 1 classical bit
+qc = QuantumCircuit(1, 1)
+
+# 2. Apply a Hadamard gate to create a superposition state (|0> + |1>)/√2
+qc.h(0)
+
+# 3. Measure the qubit into the classical register
+qc.measure(0, 0)
+
+# 4. Execute the circuit on the Aer QASM simulator
+simulator = Aer.get_backend('qasm_simulator')
+job = execute(qc, simulator, shots=1024)
+result = job.result()
+
+# 5. Output the measurement results
+counts = result.get_counts(qc)
+print("Measurement counts (should be roughly 50/50):", counts)
+`;
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(basicsQiskitCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const [activeTopic, setActiveTopic] = useState(null);
 
   // Builder Slot States (5 slots)
@@ -583,7 +612,11 @@ export default function QuantumBasics({ dark = true, setDark = (val) => { }, lan
     } else {
       setQuizSubmitted(true);
       const finalScore = quizScore;
-      setQuizPassed(finalScore === quizQuestions.length);
+      const passed = finalScore === quizQuestions.length;
+      setQuizPassed(passed);
+      if (passed) {
+        onQuizPassed();
+      }
     }
   };
 
@@ -916,6 +949,12 @@ ${circuitHtml}
               onClick={() => setView("builder")}
             >
               {dict.nav_playground}
+            </button>
+            <button
+              className={`builder-tab-btn ${view === "sandbox" ? "active" : ""}`}
+              onClick={() => setView("sandbox")}
+            >
+              Qiskit Sandbox
             </button>
             <button
               className={`builder-tab-btn ${view === "quiz" ? "active" : ""}`}
@@ -1566,6 +1605,77 @@ ${circuitHtml}
                 {dict.btn_back_dashboard || "← Back to Experiments"}
               </Link>
             </div>
+          </section>
+        </div>
+      )}      {/* RENDER MODE: QISKIT SANDBOX */}
+      {view === "sandbox" && (
+        <div className="view-fade-in" style={{ padding: "40px 0 80px" }}>
+          <section style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px" }}>
+            <div className="d-flex justify-content-between align-items-center mb-16 flex-wrap gap-2" style={{ marginBottom: 24 }}>
+              <div>
+                <h3 style={{ fontSize: "1.5rem", fontWeight: 800, margin: 0, color: "var(--text)" }}>Qiskit Sandbox</h3>
+                <p style={{ fontSize: "0.87rem", color: "var(--text-3)", marginTop: 4, margin: 0 }}>
+                  Copy this Qiskit code to run it locally or inside Google Colab.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <a
+                  href={COLAB_LINKS["1.1"]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary-wiser"
+                  style={{
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 16px",
+                    fontSize: "0.8rem",
+                    borderRadius: 6,
+                    fontWeight: 600
+                  }}
+                >
+                  <Play size={12} /> Open in Colab
+                </a>
+                <button
+                  onClick={handleCopyCode}
+                  className="btn-secondary-wiser"
+                  style={{
+                    padding: "8px 16px",
+                    fontSize: "0.8rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text)",
+                    borderRadius: 6,
+                    cursor: "pointer"
+                  }}
+                >
+                  {copied ? <CheckCircle2 size={14} style={{ color: "#34d399" }} /> : <Cpu size={14} />}
+                  {copied ? "Copied!" : "Copy Code"}
+                </button>
+              </div>
+            </div>
+
+            <pre
+              style={{
+                background: "var(--bg-canvas)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: 20,
+                fontFamily: "monospace",
+                fontSize: "0.85rem",
+                color: "var(--accent)",
+                overflowX: "auto",
+                maxHeight: 500,
+                lineHeight: 1.6
+              }}
+            >
+              {basicsQiskitCode}
+            </pre>
           </section>
         </div>
       )}

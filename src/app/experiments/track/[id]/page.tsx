@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import TRANSLATIONS, { LangCode, LANG_META } from "@/data/translations";
 import Link from "next/link";
+import { useAuth } from "@/app/AuthProvider";
+import { db } from "@/app/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 // ─────────────────────────────────────────────
 // Track 1: Bloch Sphere Interactive Calculator
@@ -390,12 +393,59 @@ export default function TrackDetailPage() {
   const idStr = params.id as string;
   const trackId = Number(idStr) || 1;
 
+  const { user } = useAuth();
+  const [statuses, setStatuses] = useState<Record<string, string>>({
+    "1.1": "Not Started",
+    "1.2": "Not Started",
+    "2.1": "Not Started",
+    "2.2": "Not Started",
+    "3.1": "Not Started",
+    "3.2": "Not Started",
+    "4.1": "Not Started",
+    "4.2": "Not Started"
+  });
+
+  useEffect(() => {
+    async function loadUserData() {
+      if (!user) return;
+      try {
+        const progressDocRef = doc(db, "progress", user.uid);
+        const progressDocSnap = await getDoc(progressDocRef);
+        if (progressDocSnap.exists() && progressDocSnap.data().experimentStatuses) {
+          setStatuses(progressDocSnap.data().experimentStatuses);
+        }
+      } catch (error) {
+        console.error("Error loading user data from Firestore:", error);
+      }
+    }
+    loadUserData();
+  }, [user]);
+
   const [dark, setDark] = useState(true);
   const [lang, setLang] = useState<LangCode>("en");
 
   const dict = TRANSLATIONS[lang];
 
+  // Load preferences from localStorage on mount
   useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setDark(savedTheme === "dark");
+    }
+    const savedLang = localStorage.getItem("lang");
+    if (savedLang) {
+      setLang(savedLang as LangCode);
+    }
+  }, []);
+
+  // Save language to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
+
+  // Apply theme class to document root and save to localStorage
+  useEffect(() => {
+    localStorage.setItem("theme", dark ? "dark" : "light");
     if (dark) {
       document.documentElement.classList.add("dark-theme");
       document.documentElement.classList.remove("light-theme");
@@ -405,8 +455,10 @@ export default function TrackDetailPage() {
     }
   }, [dark]);
 
+  // Initialize theme class on mount
   useEffect(() => {
-    document.documentElement.classList.add("dark-theme");
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.classList.add(savedTheme === "dark" ? "dark-theme" : "light-theme");
   }, []);
 
   const TRACKS_METADATA = [
@@ -481,8 +533,8 @@ export default function TrackDetailPage() {
       mathBody: "A logical state |ψ⟩_L = α|000⟩ + β|111⟩ encodes one logical qubit into three physical qubits. Parity measurements use auxiliary qubits to measure Z₁Z₂ and Z₂Z₃. For example, if qubit 1 flips, the syndrome Z₁Z₂ yields -1, identifying the location of the error without altering coefficients α and β.",
       realWorld: "Fault-tolerant architectures, such as the Surface Code, are currently being engineered by top labs (Google, IBM) to achieve logical error rates low enough for production quantum computing.",
       exps: [
-        { id: "4.1", title: dict.t4_e1, status: "Locked" },
-        { id: "4.2", title: dict.t4_e2, status: "Locked" }
+        { id: "4.1", title: dict.t4_e1, status: "In Progress" },
+        { id: "4.2", title: dict.t4_e2, status: "In Progress" }
       ],
       interactiveWidget: <SyndromeDecoder />
     }
@@ -679,8 +731,10 @@ export default function TrackDetailPage() {
             </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {track.exps.map((e) => {
-                const isCompleted = e.status === "Completed";
-                const isInProgress = e.status === "In Progress";
+                const rawStatus = statuses[e.id] || "Not Started";
+                const currentStatus = rawStatus === "Locked" ? "Not Started" : rawStatus;
+                const isCompleted = currentStatus === "Completed";
+                const isInProgress = currentStatus === "In Progress";
                 const isLocked = false;
 
                 return (
@@ -716,7 +770,7 @@ export default function TrackDetailPage() {
                           fontSize: "0.62rem"
                         }}
                       >
-                        {e.status}
+                        {currentStatus}
                       </span>
 
                       {!isLocked ? (

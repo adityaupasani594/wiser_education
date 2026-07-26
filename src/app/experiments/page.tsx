@@ -9,6 +9,9 @@ import {
 } from "lucide-react";
 import TRANSLATIONS, { LangCode, LANG_META } from "@/data/translations";
 import Link from "next/link";
+import { useAuth } from "@/app/AuthProvider";
+import { db } from "@/app/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 interface Experiment {
   id: string;
@@ -17,7 +20,7 @@ interface Experiment {
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   duration: string;
   concepts: string[];
-  status: "Completed" | "In Progress" | "Locked";
+  status: "Completed" | "In Progress" | "Locked" | "Not Started";
 }
 
 const EXPERIMENTS_DATA = (dict: any): Experiment[] => [
@@ -82,7 +85,7 @@ const EXPERIMENTS_DATA = (dict: any): Experiment[] => [
     difficulty: "Advanced",
     duration: "40 mins",
     concepts: dict.t4_c,
-    status: "Locked"
+    status: "In Progress"
   },
   {
     id: "4.2",
@@ -91,21 +94,111 @@ const EXPERIMENTS_DATA = (dict: any): Experiment[] => [
     difficulty: "Advanced",
     duration: "45 mins",
     concepts: dict.t4_c,
-    status: "Locked"
+    status: "In Progress"
   }
 ];
 
 export default function ExperimentsHome() {
+  const { user, logout } = useAuth();
+  const [profileName, setProfileName] = useState<string>("");
   const [dark, setDark] = useState(true);
   const [lang, setLang] = useState<LangCode>("en");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTrack, setSelectedTrack] = useState<number | null>(null);
+  
+  const [statuses, setStatuses] = useState<Record<string, "Completed" | "In Progress" | "Locked" | "Not Started">>({
+    "1.1": "Not Started",
+    "1.2": "Not Started",
+    "2.1": "Not Started",
+    "2.2": "Not Started",
+    "3.1": "Not Started",
+    "3.2": "Not Started",
+    "4.1": "Not Started",
+    "4.2": "Not Started"
+  });
+
+  const enforceProgressRules = (rawStatuses: Record<string, "Completed" | "In Progress" | "Locked" | "Not Started">) => {
+    const result = { ...rawStatuses };
+    const allKeys = ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2"];
+    allKeys.forEach(key => {
+      if (!result[key] || result[key] === "Locked") {
+        result[key] = "Not Started";
+      }
+    });
+    return result;
+  };
 
   const dict = TRANSLATIONS[lang];
-  const experiments = EXPERIMENTS_DATA(dict);
+  const experiments = EXPERIMENTS_DATA(dict).map(exp => ({
+    ...exp,
+    status: enforceProgressRules(statuses)[exp.id] || exp.status
+  }));
 
-  // Apply theme class to document root
+  // Fetch progress and user name from firestore
   useEffect(() => {
+    async function loadUserData() {
+      if (!user) return;
+      try {
+        // Load User profile info
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          setProfileName(userDocSnap.data().name);
+        } else {
+          setProfileName(user.displayName || "Google Learner");
+        }
+
+        // Load progress data
+        const progressDocRef = doc(db, "progress", user.uid);
+        const progressDocSnap = await getDoc(progressDocRef);
+        if (progressDocSnap.exists() && progressDocSnap.data().experimentStatuses) {
+          setStatuses(progressDocSnap.data().experimentStatuses);
+        } else {
+          // Initialize in Firestore if it doesn't exist
+          const defaultStatuses: Record<string, "Completed" | "In Progress" | "Locked" | "Not Started"> = {
+            "1.1": "Not Started",
+            "1.2": "Not Started",
+            "2.1": "Not Started",
+            "2.2": "Not Started",
+            "3.1": "Not Started",
+            "3.2": "Not Started",
+            "4.1": "Not Started",
+            "4.2": "Not Started"
+          };
+          await setDoc(progressDocRef, {
+            userId: user.uid,
+            experimentStatuses: defaultStatuses,
+            updatedAt: new Date().toISOString()
+          });
+          setStatuses(defaultStatuses);
+        }
+      } catch (error) {
+        console.error("Error loading user data from Firestore:", error);
+      }
+    }
+    loadUserData();
+  }, [user]);
+
+  // Load preferences from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setDark(savedTheme === "dark");
+    }
+    const savedLang = localStorage.getItem("lang");
+    if (savedLang) {
+      setLang(savedLang as LangCode);
+    }
+  }, []);
+
+  // Save language to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
+
+  // Apply theme class to document root and save to localStorage
+  useEffect(() => {
+    localStorage.setItem("theme", dark ? "dark" : "light");
     if (dark) {
       document.documentElement.classList.add("dark-theme");
       document.documentElement.classList.remove("light-theme");
@@ -115,8 +208,10 @@ export default function ExperimentsHome() {
     }
   }, [dark]);
 
+  // Initialize theme class on mount
   useEffect(() => {
-    document.documentElement.classList.add("dark-theme");
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.classList.add(savedTheme === "dark" ? "dark-theme" : "light-theme");
   }, []);
 
   const TRACKS = [
@@ -151,6 +246,47 @@ export default function ExperimentsHome() {
             <p className="nav-brand-sub" style={{ fontSize: "0.58rem", margin: 0 }}>Quantum Lab</p>
           </div>
         </Link>
+
+        {user && (
+          <div className="sidebar-profile-box mt-3 mb-2" style={{
+            background: "rgba(255, 255, 255, 0.02)",
+            border: "1px solid var(--border)",
+            borderRadius: 12,
+            padding: "10px 12px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6
+          }}>
+            <div className="d-flex align-items-center gap-2">
+              <div style={{
+                width: 24, height: 24, borderRadius: "50%", background: "rgba(6, 182, 212, 0.15)",
+                display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--accent)",
+                fontSize: "0.72rem", fontWeight: 700, color: "var(--text)"
+              }}>
+                {(profileName || "U").charAt(0).toUpperCase()}
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {profileName || user.email}
+                </div>
+                <div style={{ fontSize: "0.58rem", color: "var(--text-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {user.email}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={logout}
+              style={{
+                background: "none", border: "none", color: "#f87171", fontSize: "0.68rem", fontWeight: 700,
+                textAlign: "left", padding: "2px 0 0 0", cursor: "pointer", transition: "opacity 0.2s"
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = "0.8"}
+              onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
 
         <ul className="sidebar-nav-list">
           <li>
@@ -339,6 +475,7 @@ export default function ExperimentsHome() {
                   {trackExps.map((exp, index) => {
                     const isCompleted = exp.status === "Completed";
                     const isInProgress = exp.status === "In Progress";
+                    const isNotStarted = exp.status === "Not Started";
                     const isLocked = exp.status === "Locked";
 
                     return (
@@ -366,11 +503,11 @@ export default function ExperimentsHome() {
                             <span
                               className="tag-pill"
                               style={{
-                                background: isCompleted ? "rgba(52, 211, 153, 0.1)" : isInProgress ? `${t.color}15` : "var(--bg-canvas)",
-                                color: isCompleted ? "#34d399" : isInProgress ? t.color : "var(--text-3)",
+                                background: isCompleted ? "rgba(52, 211, 153, 0.1)" : (isInProgress || isNotStarted) ? `${t.color}15` : "var(--bg-canvas)",
+                                color: isCompleted ? "#34d399" : (isInProgress || isNotStarted) ? t.color : "var(--text-3)",
                                 border: isCompleted
                                   ? "1px solid rgba(52, 211, 153, 0.2)"
-                                  : isInProgress
+                                  : (isInProgress || isNotStarted)
                                     ? `1px solid ${t.color}30`
                                     : "1px solid var(--border)",
                                 fontSize: "0.6rem"
@@ -380,6 +517,8 @@ export default function ExperimentsHome() {
                                 <CheckCircle2 size={10} className="me-1" />
                               ) : isInProgress ? (
                                 <Compass size={10} className="me-1" />
+                              ) : isNotStarted ? (
+                                <Compass size={10} className="me-1" style={{ opacity: 0.7 }} />
                               ) : (
                                 <Lock size={10} className="me-1" />
                               )}
@@ -440,7 +579,13 @@ export default function ExperimentsHome() {
                                   className="btn-primary-wiser w-100 d-flex align-items-center justify-content-center gap-2"
                                   style={{ textDecoration: "none", fontSize: "0.82rem" }}
                                 >
-                                  {isCompleted ? <span>Restart Lab</span> : <span>Resume Lab</span>}
+                                  {isCompleted ? (
+                                    <span>Restart Lab</span>
+                                  ) : isNotStarted ? (
+                                    <span>Start Lab</span>
+                                  ) : (
+                                    <span>Resume Lab</span>
+                                  )}
                                   <ArrowRight size={14} />
                                 </Link>
                               </motion.div>

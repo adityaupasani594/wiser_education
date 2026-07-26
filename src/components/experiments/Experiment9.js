@@ -735,7 +735,7 @@ and enables secure real-world QKD.
         <div className="experiment-theory-wrapper">
           <div className="experiment-theory-box" role="region" aria-label="Experiment 7 theory">
             <div className="theory-top">
-              <h2 className="theory-title"><h2>Experiment 9 — Decoy-State BB84: Defeating Photon-Number Splitting</h2></h2>
+              <h2 className="theory-title">Experiment 9 — Decoy-State BB84: Defeating Photon-Number Splitting</h2>
             </div>
 
             <div className="theory-body">

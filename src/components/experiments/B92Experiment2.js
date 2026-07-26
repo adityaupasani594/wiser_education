@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 // Pointing directly to your dedicated B92 custom telemetry view
 import QuantumChannelB92 from "./QuantumChannelB92";
-import "./Experiment1.css";
+import "./B92Experiment1.css";
 // Point explicitly to your separate B92 logic engine!
 import { initializeProtocol } from "./QuantumChannelLogicB92";
 import KeyAnalysisPanelB92 from "./KeyAnalysisPanelB92";

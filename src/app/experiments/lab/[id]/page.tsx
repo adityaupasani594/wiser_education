@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import TRANSLATIONS, { LangCode, LANG_META } from "@/data/translations";
 import Link from "next/link";
+import { useAuth } from "@/app/AuthProvider";
+import { db } from "@/app/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 // QKD Experiment Imports
 import Exp1BB84 from "@/components/experiments/Experiment1";
@@ -31,6 +34,13 @@ import QuantumBasics from "@/components/experiments/QuantumBasics";
 import "@/components/experiments/QuantumBasics.css";
 import QuantumEntanglement from "@/components/experiments/QuantumEntanglement";
 import "@/components/experiments/QuantumEntanglement.css";
+import Experiment41 from "@/components/experiments/Experiment41";
+import "@/components/experiments/Experiment41.css";
+import Experiment42 from "@/components/experiments/Experiment42";
+import "@/components/experiments/Experiment42.css";
+import { TRANSLATIONS_EXP_3_1 } from "@/data/translations_exp_3.1";
+import { TRANSLATIONS_EXP_3_2 } from "@/data/translations_exp_3.2";
+import { COLAB_LINKS } from "@/data/colabLinks";
 
 
 // ---------------------------------------------
@@ -941,7 +951,7 @@ function TheoryTopicVisual({ id }: { id: string }) {
     return (
       <div className="visual-graphic-container">
         <svg width="220" height="150" viewBox="0 0 220 150">
-          <rect x="20" y="45" width="180" height="60" rx="10" fill="rgba(255,255,255,0.02)" stroke="var(--border)" strokeWidth="1.5" />
+          <rect x="20" y="45" width="180" height="60" rx="10" fill="var(--bg-canvas)" stroke="var(--border)" strokeWidth="1.5" />
           <line x1="20" y1="75" x2="200" y2="75" stroke="#34d399" strokeWidth="3" strokeDasharray="10 5" />
           <text x="110" y="80" fill="#34d399" fontSize="16" fontWeight="bold" textAnchor="middle">101100</text>
         </svg>
@@ -1014,9 +1024,9 @@ function TheoryTopicVisual({ id }: { id: string }) {
           <rect x="90" y="30" width="30" height="30" rx="4" fill="rgba(6, 182, 212, 0.1)" stroke="#06b6d4" strokeWidth="1.5" />
           <text x="105" y="49" fill="#06b6d4" fontSize="12" fontWeight="bold" textAnchor="middle">H</text>
 
-          <rect x="140" y="30" width="30" height="30" rx="4" fill="rgba(255,255,255,0.02)" stroke="var(--border)" strokeWidth="1.5" />
+          <rect x="140" y="30" width="30" height="30" rx="4" fill="var(--bg-canvas)" stroke="var(--border)" strokeWidth="1.5" />
           <text x="155" y="49" fill="var(--text)" fontSize="12" fontWeight="bold" textAnchor="middle">M</text>
-          <rect x="140" y="80" width="30" height="30" rx="4" fill="rgba(255,255,255,0.02)" stroke="var(--border)" strokeWidth="1.5" />
+          <rect x="140" y="80" width="30" height="30" rx="4" fill="var(--bg-canvas)" stroke="var(--border)" strokeWidth="1.5" />
           <text x="155" y="99" fill="var(--text)" fontSize="12" fontWeight="bold" textAnchor="middle">M</text>
         </svg>
         <span className="visual-caption">Bell Basis Decoding Measurement</span>
@@ -1024,18 +1034,333 @@ function TheoryTopicVisual({ id }: { id: string }) {
     );
   }
 
+  if (id === "bb84-baseline") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <line x1="20" y1="75" x2="200" y2="75" stroke="var(--border)" strokeWidth="1.5" strokeDasharray="4 4" />
+          <circle cx="50" cy="75" r="14" fill="rgba(6, 182, 212, 0.1)" stroke="#06b6d4" strokeWidth="2" />
+          <text x="50" y="79" fill="#06b6d4" fontSize="10" fontWeight="bold" textAnchor="middle">Alice</text>
+
+          <path d="M 80 75 L 140 75" stroke="#fbbf24" strokeWidth="2" markerEnd="url(#arrow-qkd)" />
+
+          <circle cx="170" cy="75" r="14" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" strokeWidth="2" />
+          <text x="170" y="79" fill="#a78bfa" fontSize="10" fontWeight="bold" textAnchor="middle">Bob</text>
+          <defs>
+            <marker id="arrow-qkd" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24" />
+            </marker>
+          </defs>
+        </svg>
+        <span className="visual-caption">Alice-to-Bob Ideal Channel</span>
+      </div>
+    );
+  }
+
+  if (id === "bases-polarization") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <g transform="translate(60, 75)">
+            <circle cx="0" cy="0" r="24" fill="none" stroke="#06b6d4" strokeWidth="1.5" />
+            <line x1="-16" y1="0" x2="16" y2="0" stroke="#06b6d4" strokeWidth="2" />
+            <line x1="0" y1="-16" x2="0" y2="16" stroke="#06b6d4" strokeWidth="2" />
+            <text x="0" y="38" fill="#06b6d4" fontSize="10" textAnchor="middle" fontWeight="bold">Basis (+)</text>
+          </g>
+          <g transform="translate(160, 75)">
+            <circle cx="0" cy="0" r="24" fill="none" stroke="#a78bfa" strokeWidth="1.5" />
+            <line x1="-12" y1="-12" x2="12" y2="12" stroke="#a78bfa" strokeWidth="2" />
+            <line x1="-12" y1="12" x2="12" y2="-12" stroke="#a78bfa" strokeWidth="2" />
+            <text x="0" y="38" fill="#a78bfa" fontSize="10" textAnchor="middle" fontWeight="bold">Basis (×)</text>
+          </g>
+        </svg>
+        <span className="visual-caption">Conjugate Polarization Bases</span>
+      </div>
+    );
+  }
+
+  if (id === "eavesdropping-detection") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <line x1="20" y1="50" x2="200" y2="50" stroke="var(--border)" strokeWidth="1.5" strokeDasharray="3 3" />
+
+          <circle cx="40" cy="50" r="12" fill="rgba(6, 182, 212, 0.1)" stroke="#06b6d4" strokeWidth="1.5" />
+          <circle cx="180" cy="50" r="12" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" strokeWidth="1.5" />
+
+          <circle cx="110" cy="70" r="14" fill="rgba(244, 63, 94, 0.1)" stroke="#f43f5e" strokeWidth="2" />
+          <text x="110" y="74" fill="#f43f5e" fontSize="9" fontWeight="bold" textAnchor="middle">Eve</text>
+
+          <path d="M 40 50 L 110 70 L 180 50" fill="none" stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="3 3" />
+          <rect x="75" y="110" width="70" height="20" rx="4" fill="rgba(244, 63, 94, 0.15)" stroke="#f43f5e" strokeWidth="1" />
+          <text x="110" y="123" fill="#f43f5e" fontSize="9" fontWeight="bold" textAnchor="middle">QBER &gt; 11%</text>
+        </svg>
+        <span className="visual-caption">Intercept-Resend Interruption</span>
+      </div>
+    );
+  }
+
+  if (id === "fiber-limitations") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <path d="M 30 40 Q 110 110, 190 120" fill="none" stroke="#fbbf24" strokeWidth="2.5" />
+          <circle cx="30" cy="40" r="4" fill="#fbbf24" />
+          <circle cx="190" cy="120" r="4" fill="#fbbf24" />
+          <text x="30" y="30" fill="var(--text-3)" fontSize="9">0 km</text>
+          <text x="190" y="135" fill="var(--text-3)" fontSize="9">100 km</text>
+          <text x="110" y="65" fill="#fbbf24" fontSize="10" fontWeight="bold">Loss (dB)</text>
+        </svg>
+        <span className="visual-caption">Exponential Fiber Attenuation</span>
+      </div>
+    );
+  }
+
+  if (id === "b92-baseline") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <g transform="translate(60, 75)">
+            <circle cx="0" cy="0" r="22" fill="none" stroke="#06b6d4" strokeWidth="1.5" />
+            <line x1="-14" y1="0" x2="14" y2="0" stroke="#06b6d4" strokeWidth="2" />
+            <text x="0" y="34" fill="#06b6d4" fontSize="9" textAnchor="middle" fontWeight="bold">Bit 0 (0°)</text>
+          </g>
+          <g transform="translate(160, 75)">
+            <circle cx="0" cy="0" r="22" fill="none" stroke="#a78bfa" strokeWidth="1.5" />
+            <line x1="-10" y1="-10" x2="10" y2="10" stroke="#a78bfa" strokeWidth="2" />
+            <text x="0" y="34" fill="#a78bfa" fontSize="9" textAnchor="middle" fontWeight="bold">Bit 1 (45°)</text>
+          </g>
+        </svg>
+        <span className="visual-caption">Two Non-Orthogonal B92 States</span>
+      </div>
+    );
+  }
+
+  if (id === "conclusive-sifting") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <rect x="25" y="40" width="75" height="50" rx="5" fill="var(--bg-canvas)" stroke="var(--border)" strokeWidth="1" />
+          <text x="62" y="58" fill="var(--accent)" fontSize="8" textAnchor="middle" fontWeight="bold">Bit 1 Detector</text>
+          <text x="62" y="74" fill="var(--text)" fontSize="10" textAnchor="middle" fontWeight="bold">Click ➜ Conclusive</text>
+
+          <rect x="120" y="40" width="75" height="50" rx="5" fill="var(--bg-canvas)" stroke="var(--border)" strokeWidth="1" />
+          <text x="157" y="58" fill="var(--accent-2)" fontSize="8" textAnchor="middle" fontWeight="bold">Bit 0 Detector</text>
+          <text x="157" y="74" fill="var(--text)" fontSize="10" textAnchor="middle" fontWeight="bold">Click ➜ Conclusive</text>
+        </svg>
+        <span className="visual-caption">Conclusive Detection Cross-Parity</span>
+      </div>
+    );
+  }
+
+  if (id === "b92-noise") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <circle cx="110" cy="75" r="20" fill="none" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="3 3" />
+          <path d="M 90 75 Q 110 50, 130 75" fill="none" stroke="#fbbf24" strokeWidth="2" />
+          <path d="M 90 75 Q 110 100, 130 75" fill="none" stroke="#fbbf24" strokeWidth="2" />
+          <text x="110" y="112" fill="#fbbf24" fontSize="9" textAnchor="middle" fontWeight="bold">Fiber Fluctuations</text>
+        </svg>
+        <span className="visual-caption">Depolarizing Channel Noise</span>
+      </div>
+    );
+  }
+
+  if (id === "b92-eavesdropping") {
+    return (
+      <div className="visual-graphic-container">
+        <svg width="220" height="150" viewBox="0 0 220 150">
+          <rect x="40" y="40" width="140" height="60" rx="6" fill="rgba(244, 63, 94, 0.05)" stroke="#f43f5e" strokeWidth="1.5" />
+          <text x="110" y="65" fill="#f43f5e" fontSize="10" textAnchor="middle" fontWeight="bold">Eavesdropper active</text>
+          <text x="110" y="85" fill="var(--text-3)" fontSize="9" textAnchor="middle">conclusive rate mismatch</text>
+        </svg>
+        <span className="visual-caption">Eve Induces Disturbance Thresholds</span>
+      </div>
+    );
+  }
+
   return null;
 }
+
+const bb84Topics = [
+  {
+    id: "bb84-baseline",
+    label: "BB84 Protocol Foundations",
+    tag: "Alice & Bob's ideal communication",
+    bullets: [
+      "Alice randomly selects a bit value (0 or 1) and a basis (+ or ×) for each photon.",
+      "She encodes the bit onto the photon's polarization: |0⟩ or |1⟩ in the + basis; |+⟩ or |−⟩ in the × basis.",
+      "Bob independently chooses a random basis for each photon. Sifted key is formed from matching bases."
+    ],
+    description: "The BB84 protocol, devised by Charles Bennett and Gilles Brassard in 1984, is the world's first quantum key distribution scheme. It uses the quantum mechanical principle that measuring a quantum state disturbs it irreversibly, making any eavesdropping detectable. In this baseline experiment, Alice and Bob communicate over an ideal, noise-free fiber channel with no eavesdropper present."
+  },
+  {
+    id: "bases-polarization",
+    label: "Conjugate Bases & Polarization",
+    tag: "Mutually unbiased polarization states",
+    bullets: [
+      "BB84 employs two mutually unbiased bases: Rectilinear (+) Horizontal/Vertical and Diagonal (×) +45°/−45°.",
+      "These bases are conjugate — measuring in the wrong basis yields a completely random result (50% chance).",
+      "Sifting compares bases publicly, keeping only matched bases to build a shared secure key."
+    ],
+    description: "BB84 employs two mutually unbiased bases. Horizontally polarized and vertically polarized states form the rectilinear basis (+). Polarizations at +45° and −45° form the diagonal basis (×). When Bob measures using Alice's basis, he gets the exact bit. Using the wrong basis collapses the qubit and randomizes the outcome."
+  },
+  {
+    id: "eavesdropping-detection",
+    label: "Eavesdropping & Intercept-Resend",
+    tag: "How Eve's active intercept disturbs states",
+    bullets: [
+      "If Eve intercepts a photon, she must guess the measurement basis, causing state collapse.",
+      "Eve's wrong-basis measurements introduce random noise, causing a 25% QBER in Bob's sifted key.",
+      "If the Quantum Bit Error Rate (QBER) exceeds 11%, Alice and Bob abort the key as insecure."
+    ],
+    description: "When Eve intercepts a photon, she must guess a basis with 50% chance of being wrong. Wrong-basis measurement collapses the qubit, and Eve retransmits the wrong state — introducing detectable errors in Bob's matched-basis positions. A full intercept-resend attack raises QBER to 25%, well above the 11% abort limit."
+  },
+  {
+    id: "fiber-limitations",
+    label: "Fiber Constraints & Decoy States",
+    tag: "Photon loss, noise, and PNS attack mitigation",
+    bullets: [
+      "Optical fibers exhibit absorption loss (~0.2 dB/km), reducing photon delivery rates.",
+      "Detector dark counts and noise create background errors that increase QBER over long distances.",
+      "Decoy State protocol transmits pulses at varying intensities to detect Photon Number Splitting (PNS) attacks."
+    ],
+    description: "Real-world optical fiber channels suffer from thermal noise, absorption loss, and phase errors. Thermal noise raises the baseline QBER. Decoy state transmission allows Alice and Bob to measure photon yield per intensity level, exposing PNS attacks and enabling long-distance fiber QKD."
+  }
+];
+
+const b92Topics = [
+  {
+    id: "b92-baseline",
+    label: "B92 Protocol Baseline",
+    tag: "Simplifying QKD with two non-orthogonal states",
+    bullets: [
+      "Alice maps bit 0 to 0° (horizontal) and bit 1 to 45° (diagonal) polarization.",
+      "Because horizontal and diagonal polarizations are non-orthogonal, they cannot be perfectly cloned.",
+      "The simplicity of B92 reduces the required laser sources from four to two."
+    ],
+    description: "The B92 protocol, proposed by Charles Bennett in 1992, simplifies quantum key distribution to use only two non-orthogonal quantum states — one for bit 0 and one for bit 1. While simpler than BB84, it achieves the same unconditional security guarantee rooted in the quantum No-Cloning Theorem."
+  },
+  {
+    id: "conclusive-sifting",
+    label: "Bob's Conclusive & Inconclusive Detections",
+    tag: "Cross-polarized filters for conclusive keys",
+    bullets: [
+      "Bob measures using cross-polarized filters: 90° (vertical) to detect bit 1, and -45° to detect bit 0.",
+      "A click at 90° conclusively identifies bit 1; a click at -45° conclusively identifies bit 0.",
+      "No click means the result was inconclusive (erasure), which occurs roughly 50% of the time in ideal runs."
+    ],
+    description: "Bob uses cross-polarized filters. A click at the 90° filter conclusively identifies that Alice sent bit 1. A click at −45° identifies bit 0. No click (erasure) means the measurement was inconclusive — roughly 50% of all ideal transmissions. Only conclusive events form the sifted key."
+  },
+  {
+    id: "b92-noise",
+    label: "Channel Losses & Base Noise",
+    tag: "Dealing with real-world optical fibers",
+    bullets: [
+      "Optical attenuation and dark counts drop key rates and introduce baseline errors.",
+      "Attenuation scales exponentially: over 50 km, roughly 90% of photons are lost.",
+      "Baseline noise must be corrected classically to guarantee the security of the final key."
+    ],
+    description: "Real fiber-optic quantum channels introduce depolarizing noise, photon loss from attenuation, and phase errors. These imperfections convert some valid conclusive measurements into errors, raising the QBER even without any eavesdropper. Distance reduces key rate, and noise raises baseline errors."
+  },
+  {
+    id: "b92-eavesdropping",
+    label: "Eavesdropping & Security Bound",
+    tag: "Detecting Eve's signature in B92",
+    bullets: [
+      "Eve's interception attempts disturb the polarization, creating error clicks for Bob.",
+      "Measuring non-orthogonal states causes Eve to retransmit corrupted states, raising the QBER.",
+      "If the conclusive rate drops or QBER exceeds 11%, the communication is aborted."
+    ],
+    description: "In B92, Eve faces a harder challenge — the two states are non-orthogonal, so any measurement attempt has a non-zero probability of misidentifying the state. This introduces errors into the conclusive click events that Bob and Alice detect as elevated QBER. The standard abort threshold is 11% QBER."
+  }
+];
 
 export default function LabWorkspacePage() {
   const params = useParams();
   const idStr = params.id as string; // "2.1", "2.2", "3.1", or "3.2"
-
+  const { user, loading: authLoading } = useAuth();
 
   const isTeleport = idStr === "2.1";
 
   const [dark, setDark] = useState(true);
   const [lang, setLang] = useState<LangCode>("en");
+  const [labStatus, setLabStatus] = useState<"Loading" | "In Progress" | "Completed" | "Locked">("Loading");
+
+  // Fetch progress and check if current lab is unlocked/completed on mount
+  useEffect(() => {
+    async function checkLabStatus() {
+      if (authLoading) return;
+      if (!user) {
+        setLabStatus("Locked");
+        return;
+      }
+      try {
+        const progressDocRef = doc(db, "progress", user.uid);
+        const progressDocSnap = await getDoc(progressDocRef);
+
+        let statuses: Record<string, string> = {
+          "1.1": "Not Started",
+          "1.2": "Not Started",
+          "2.1": "Not Started",
+          "2.2": "Not Started",
+          "3.1": "Not Started",
+          "3.2": "Not Started",
+          "4.1": "Not Started",
+          "4.2": "Not Started"
+        };
+
+        if (progressDocSnap.exists() && progressDocSnap.data().experimentStatuses) {
+          statuses = { ...statuses, ...progressDocSnap.data().experimentStatuses };
+        }
+
+        let currentStatus = statuses[idStr];
+        if (!currentStatus || currentStatus === "Locked") {
+          currentStatus = "Not Started";
+        }
+
+        // Auto transition Not Started to In Progress in the database
+        if (currentStatus === "Not Started") {
+          currentStatus = "In Progress";
+          statuses[idStr] = "In Progress";
+          await setDoc(progressDocRef, {
+            userId: user.uid,
+            experimentStatuses: statuses,
+            updatedAt: new Date().toISOString()
+          });
+        }
+
+        setLabStatus(currentStatus as any);
+        if (currentStatus === "Completed") {
+          setQuizPassed(true);
+        }
+      } catch (err) {
+        console.error("Error loading lab status:", err);
+        if (idStr === "1.1") setLabStatus("In Progress");
+        else setLabStatus("Locked");
+      }
+    }
+    checkLabStatus();
+  }, [user, authLoading, idStr]);
+
+  // Load preferences from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setDark(savedTheme === "dark");
+    }
+    const savedLang = localStorage.getItem("lang");
+    if (savedLang) {
+      setLang(savedLang as LangCode);
+    }
+  }, []);
+
+  // Save language to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
+
   const [activeTab, setActiveTab] = useState<"theory" | "visual" | "activity" | "sandbox" | "quiz" | "report">("theory");
 
   const [bb84SubExp, setBb84SubExp] = useState(1);
@@ -1289,8 +1614,9 @@ export default function LabWorkspacePage() {
 
 
 
-  // Apply theme class to document root
+  // Apply theme class to document root and save to localStorage
   useEffect(() => {
+    localStorage.setItem("theme", dark ? "dark" : "light");
     if (dark) {
       document.documentElement.classList.add("dark-theme");
       document.documentElement.classList.remove("light-theme");
@@ -1300,8 +1626,10 @@ export default function LabWorkspacePage() {
     }
   }, [dark]);
 
+  // Initialize theme class on mount
   useEffect(() => {
-    document.documentElement.classList.add("dark-theme");
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.classList.add(savedTheme === "dark" ? "dark-theme" : "light-theme");
   }, []);
 
 
@@ -1401,6 +1729,47 @@ export default function LabWorkspacePage() {
     }
   };
 
+  const saveLabCompletion = async (labId: string) => {
+    if (!user) return;
+    try {
+      const progressDocRef = doc(db, "progress", user.uid);
+      const progressDocSnap = await getDoc(progressDocRef);
+      let statuses: Record<string, string> = {
+        "1.1": "In Progress",
+        "1.2": "Not Started",
+        "2.1": "Not Started",
+        "2.2": "Not Started",
+        "3.1": "Not Started",
+        "3.2": "Not Started",
+        "4.1": "Not Started",
+        "4.2": "Not Started"
+      };
+      if (progressDocSnap.exists() && progressDocSnap.data().experimentStatuses) {
+        statuses = { ...statuses, ...progressDocSnap.data().experimentStatuses };
+      }
+
+      statuses[labId] = "Completed";
+
+      // Ensure no labs remain locked
+      const allKeys = ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2"];
+      allKeys.forEach(key => {
+        if (!statuses[key] || statuses[key] === "Locked") {
+          statuses[key] = "In Progress";
+        }
+      });
+
+      await setDoc(progressDocRef, {
+        userId: user.uid,
+        experimentStatuses: statuses,
+        updatedAt: new Date().toISOString()
+      });
+      setLabStatus("Completed");
+      setQuizPassed(true);
+    } catch (err) {
+      console.error("Error saving lab completion:", err);
+    }
+  };
+
   const handleNextQuestion = (forced = false) => {
     setSelectedOpt(null);
     setTimeLeft(30);
@@ -1410,7 +1779,12 @@ export default function LabWorkspacePage() {
     } else {
       setQuizSubmitted(true);
       const finalScore = quizScore + (forced ? 0 : 0);
-      setQuizPassed(finalScore === questions.length);
+      const passed = finalScore === questions.length;
+      setQuizPassed(passed);
+
+      if (passed) {
+        saveLabCompletion(idStr);
+      }
     }
   };
 
@@ -1773,12 +2147,104 @@ ${svgCircuit}
 
 
 
+  if (labStatus === "Loading") {
+    return (
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        background: "var(--bg-canvas, #050505)",
+        color: "var(--text, #ffffff)",
+        fontFamily: "'Inter', sans-serif"
+      }}>
+        <div className="quantum-spinner" style={{
+          width: 50,
+          height: 50,
+          borderRadius: "50%",
+          border: "3px solid rgba(6, 182, 212, 0.15)",
+          borderTopColor: "var(--accent, #06b6d4)",
+          animation: "spin-loader 1s linear infinite"
+        }} />
+        <p style={{ marginTop: 20, fontSize: "0.85rem", color: "var(--text-3, #888)", letterSpacing: "0.06em", fontWeight: 500 }}>
+          LOADING EXPERIMENT {idStr}...
+        </p>
+        <style>{`
+          @keyframes spin-loader {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (labStatus === "Locked") {
+    return (
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        background: "radial-gradient(circle at 50% 50%, #0c0f1c 0%, #05060b 100%)",
+        color: "var(--text, #ffffff)",
+        fontFamily: "'Inter', sans-serif",
+        padding: 24
+      }}>
+        <div style={{
+          maxWidth: 480,
+          width: "100%",
+          background: "rgba(15, 23, 42, 0.55)",
+          border: "1px solid rgba(255, 255, 255, 0.05)",
+          borderRadius: 24,
+          padding: "48px 32px",
+          textAlign: "center",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)"
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: "50%", background: "rgba(239, 68, 68, 0.08)",
+            border: "1px solid rgba(239, 68, 68, 0.2)", display: "flex", alignItems: "center",
+            justifyContent: "center", margin: "0 auto 24px"
+          }}>
+            <Lock size={28} color="#ef4444" />
+          </div>
+
+          <h3 style={{ fontSize: "1.4rem", fontWeight: 800, marginBottom: 12 }}>
+            Lab Module Locked
+          </h3>
+
+          <p style={{ fontSize: "0.88rem", color: "var(--text-3, #888)", lineHeight: 1.6, marginBottom: 32 }}>
+            {idStr === "1.2"
+              ? "You must complete Qubit States & Rotations (Experiment 1.1) before unlocking this entanglement lab."
+              : "To access this advanced lab, you must first complete the baseline requirements: Experiment 1.1 (Qubit Basics) and Experiment 1.2 (Qubit Entanglement)."}
+          </p>
+
+          <Link href="/experiments" className="btn-primary-wiser d-inline-flex align-items-center gap-2" style={{ textDecoration: "none", margin: "0 auto" }}>
+            <Compass size={16} />
+            <span>Return to Dashboard</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (idStr === "1.1") {
-    return <QuantumBasics dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
+    return <QuantumBasics dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("1.1")} />;
   }
 
   if (idStr === "1.2") {
-    return <QuantumEntanglement dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
+    return <QuantumEntanglement dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("1.2")} />;
+  }
+
+  if (idStr === "4.1") {
+    return <Experiment41 dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
+  }
+
+  if (idStr === "4.2") {
+    return <Experiment42 dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
   }
 
   if (idStr === "3.1") {
@@ -1820,7 +2286,7 @@ ${svgCircuit}
                   <option value={7}>7. Photon Loss &amp; Fiber Transmission</option>
                   <option value={8}>8. Fiber Distance &amp; Attenuation Limits</option>
                   <option value={9}>9. Decoy State Protocol vs PNS Attacks</option>
-                  <option value={10}>10. Man-in-the-Middle &amp; Authentication Attacks</option>
+                  <option value={10}>10. Man-in-in-the-Middle &amp; Authentication Attacks</option>
                 </select>
               </div>
             </div>
@@ -1832,57 +2298,189 @@ ${svgCircuit}
           </header>
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: "32px", minHeight: 400 }}>
             <AnimatePresence mode="wait">
-              {activeTab === "theory" && (
-                <motion.div key="theory-31" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h3 style={{ fontSize: "1.35rem", fontWeight: 700, marginBottom: 20, color: "var(--accent)" }}>
-                    {["", "Experiment 1: Ideal BB84 Protocol", "Experiment 2: Bases & Polarization", "Experiment 3: Eavesdropping Detection", "Experiment 4: Partial Intercept-Resend Attack", "Experiment 5: Photon Count Effect on QBER", "Experiment 6: Environmental Channel Noise", "Experiment 7: Photon Loss & Fiber Transmission", "Experiment 8: Fiber Distance & Attenuation Limits", "Experiment 9: Decoy State Protocol vs PNS Attacks", "Experiment 10: Man-in-the-Middle & Authentication Attacks"][bb84SubExp]}
-                  </h3>
-                  {bb84SubExp === 1 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>The BB84 protocol, devised by Charles Bennett and Gilles Brassard in 1984, is the world's first quantum key distribution scheme. It uses the quantum mechanical principle that measuring a quantum state disturbs it irreversibly, making any eavesdropping detectable. In this baseline experiment, Alice and Bob communicate over an ideal, noise-free fiber channel with no eavesdropper present.</p>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>What Alice Does</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>Alice randomly selects a bit value (0 or 1) and a basis (Rectilinear <strong>+</strong> or Diagonal <strong>×</strong>) for each photon. She encodes the bit onto the photon's polarization: |0⟩ or |1⟩ in the + basis; |+⟩ or |−⟩ in the × basis.</p></div>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>What Bob Does</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>Bob independently chooses a random basis for each photon. When his basis matches Alice's, he gets the correct bit. When they differ, his result is random. After transmission they compare bases publicly — keeping only matching-basis results as the <strong>sifted key</strong>.</p></div>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> In an ideal channel with no Eve, the QBER is exactly 0%. Any error rate above 11% is evidence of eavesdropping. This experiment establishes the clean baseline.</p></div>
-                  </div>)}
-                  {bb84SubExp === 2 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>BB84 employs two mutually unbiased bases. The Rectilinear basis (+) uses horizontal and vertical polarizations. The Diagonal basis (×) uses +45° and −45° polarizations. These bases are <em>conjugate</em> — measuring in the wrong basis yields a completely random result.</p>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>Encoding Table</h5><table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}><thead><tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text-3)" }}><th style={{ padding: "8px 12px", textAlign: "left" }}>Bit</th><th style={{ padding: "8px 12px", textAlign: "left" }}>Basis +</th><th style={{ padding: "8px 12px", textAlign: "left" }}>Basis ×</th></tr></thead><tbody><tr style={{ borderBottom: "1px solid var(--border)" }}><td style={{ padding: "8px 12px" }}>0</td><td style={{ padding: "8px 12px" }}>→ (0°)</td><td style={{ padding: "8px 12px" }}>↗ (+45°)</td></tr><tr><td style={{ padding: "8px 12px" }}>1</td><td style={{ padding: "8px 12px" }}>↑ (90°)</td><td style={{ padding: "8px 12px" }}>↘ (−45°)</td></tr></tbody></table></div>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Mismatched bases produce random outcomes; matched bases produce deterministic results. This experiment visualizes that boundary directly.</p></div>
-                  </div>)}
-                  {bb84SubExp === 3 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>When Eve intercepts a photon, she must guess a basis with 50% chance of being wrong. Wrong-basis measurement collapses the qubit, and Eve retransmits the wrong state — introducing detectable errors in Bob's matched-basis positions.</p>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>Intercept-Resend Attack</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>In a full intercept-resend attack (Eve intercepts every photon), the QBER rises to approximately <strong>25%</strong> — well above the 11% abort threshold, statistically guaranteeing Eve's presence is detectable.</p></div>
-                    <div style={{ background: "rgba(244,63,94,0.08)", borderLeft: "4px solid #f43f5e", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Security Threshold:</strong> QBER above 11% means the key must be aborted. Below this, the channel is considered secure.</p></div>
-                  </div>)}
-                  {bb84SubExp === 4 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>In a partial eavesdropping attack, Eve intercepts only a fraction of photons. This reduces her information but also reduces the visible QBER signature — making detection harder. The relationship follows: if Eve intercepts fraction <em>p</em>, expected QBER ≈ p/4.</p>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Slide the Eve interception level and observe how the QBER grows toward the abort threshold. This is the fundamental security-information tradeoff of QKD.</p></div>
-                  </div>)}
-                  {bb84SubExp === 5 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>Statistical confidence in QBER depends on sample size. With very few photons, random fluctuations cause high apparent QBER even without Eve. As photon count increases, the QBER estimate stabilizes around its true value — the Law of Large Numbers in quantum cryptography.</p>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Vary photon count from 8 to 256 and observe how QBER variance decreases. Real QKD systems transmit millions of photons per second to ensure reliable estimation.</p></div>
-                  </div>)}
-                  {bb84SubExp === 6 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>Real-world optical fiber channels suffer from thermal noise, birefringence, and dark counts. Channel noise causes random bit flips even without an eavesdropper present.</p>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Observe how intrinsic channel noise inflates baseline QBER. Classical error correction (like CASCADE or Winnow) is required to reconcile these non-eavesdropper errors.</p></div>
-                  </div>)}
-                  {bb84SubExp === 7 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>In fiber transmission, photons are absorbed or scattered over distance. Photon loss reduces the rate at which Bob receives photons, decreasing secret key throughput without compromising security.</p>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> As photon loss increases, the raw key length shrinks. However, because lost photons do not leak state information, the protocol remains fundamentally secure.</p></div>
-                  </div>)}
-                  {bb84SubExp === 8 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>Optical fibers exhibit an attenuation loss of ~0.2 dB/km at 1550 nm. At longer distances, detector dark counts become comparable to signal counts, causing QBER to surpass the 11% abort limit.</p>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Increase channel distance (in km) to observe the exponential key rate drop and identify the maximum operational distance limit before QBER exceeds 11%.</p></div>
-                  </div>)}
-                  {bb84SubExp === 9 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>Practical QKD laser sources occasionally emit multi-photon pulses. An eavesdropper can execute a Photon Number Splitting (PNS) attack by stealing extra photons without being detected. The Decoy State protocol solves this by sending pulses at varying mean photon intensities (&mu;).</p>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Decoy state transmission allows Alice and Bob to measure photon yield per intensity level, exposing PNS attacks and enabling long-distance fiber QKD.</p></div>
-                  </div>)}
-                  {bb84SubExp === 10 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>If the classical channel is unauthenticated, Eve can intercept communications and execute a Man-in-the-Middle (MitM) attack by posing as Bob to Alice and Alice to Bob.</p>
-                    <div style={{ background: "rgba(244,63,94,0.08)", borderLeft: "4px solid #f43f5e", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Security Defense:</strong> QKD requires pre-shared classical secret keys for authentication (e.g. Wegman-Carter hash tags) to prevent MitM impersonation attacks.</p></div>
-                  </div>)}
-                </motion.div>
-              )}
+              {activeTab === "theory" && (() => {
+                const qkd1 = TRANSLATIONS_EXP_3_1[lang];
+                const bb84TopicsList = [
+                  { id: "bb84-baseline", label: qkd1.topics["bb84-baseline"].label, tag: qkd1.topics["bb84-baseline"].tag, bullets: qkd1.topics["bb84-baseline"].bullets, description: qkd1.topics["bb84-baseline"].description },
+                  { id: "bases-polarization", label: qkd1.topics["bases-polarization"].label, tag: qkd1.topics["bases-polarization"].tag, bullets: qkd1.topics["bases-polarization"].bullets, description: qkd1.topics["bases-polarization"].description },
+                  { id: "eavesdropping-detection", label: qkd1.topics["eavesdropping-detection"].label, tag: qkd1.topics["eavesdropping-detection"].tag, bullets: qkd1.topics["eavesdropping-detection"].bullets, description: qkd1.topics["eavesdropping-detection"].description },
+                  { id: "fiber-limitations", label: qkd1.topics["fiber-limitations"].label, tag: qkd1.topics["fiber-limitations"].tag, bullets: qkd1.topics["fiber-limitations"].bullets, description: qkd1.topics["fiber-limitations"].description },
+                ];
+                return (
+                  <motion.div key="theory-31" className="learn-page" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                    {/* HERO TITLE SECTION */}
+                    <header className="learn-hero" style={{ padding: "40px 0", marginBottom: "40px", borderBottom: "1px solid var(--border)" }}>
+                      <div className="learn-hero-inner">
+                        <span className="learn-pill" style={{ background: "rgba(6, 182, 212, 0.1)", color: "#06b6d4", padding: "4px 12px", borderRadius: 100, fontSize: "0.75rem", fontWeight: 700 }}>Experiment 3.1</span>
+                        <h1 style={{ fontSize: "2.2rem", fontWeight: 800, margin: "12px 0 8px 0", color: "var(--text)" }}>{qkd1.hero_title}</h1>
+                        <p className="learn-hero-sub" style={{ fontSize: "1rem", color: "var(--text-3)", maxWidth: 680, lineHeight: 1.6, margin: 0 }}>{qkd1.hero_sub}</p>
+
+                        <div className="learn-hero-buttons" style={{ display: "flex", gap: 12, marginTop: 24 }}>
+                          <button className="learn-cta-primary btn-primary-wiser" onClick={() => setActiveTab("visual")} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                            {qkd1.btn_launch_playground}
+                          </button>
+                          <button className="learn-cta-secondary btn-secondary-wiser" onClick={() => {
+                            const el = document.getElementById("bb84-baseline");
+                            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                          }} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                            {qkd1.btn_start_learning}
+                          </button>
+                        </div>
+                      </div>
+                    </header>
+
+                    {/* CORE PRINCIPLES CONTAINER */}
+                    <section className="learn-topics" style={{ marginBottom: 60 }}>
+                      <div className="learn-topics-header" style={{ marginBottom: 30 }}>
+                        <h2 style={{ fontSize: "1.6rem", fontWeight: 700 }}>{qkd1.section_title}</h2>
+                        <p style={{ color: "var(--text-3)" }}>{qkd1.section_sub}</p>
+                      </div>
+
+                      {/* EXPANDABLE CARDS GRID */}
+                      <div className="learn-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+                        {bb84TopicsList.map((t) => (
+                          <div
+                            key={t.id}
+                            className="learn-card"
+                            style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, cursor: "pointer", transition: "transform 0.2s" }}
+                            onClick={() => {
+                              const el = document.getElementById(t.id);
+                              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }}
+                          >
+                            <div className="learn-card-visual-placeholder" style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}>
+                              <TheoryTopicVisual id={t.id} />
+                            </div>
+                            <div className="learn-card-body">
+                              <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>{t.label}</h3>
+                              <p style={{ fontSize: "0.82rem", color: "var(--text-3)", lineHeight: 1.5, margin: 0 }}>{t.tag}</p>
+                              <span className="learn-card-link" style={{ fontSize: "0.75rem", color: "var(--accent)", fontWeight: 700, display: "block", marginTop: 12 }}>
+                                {qkd1.quick_summary} &rarr;
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    {/* YOUTUBE VIDEO RESOURCES */}
+                    <section style={{ padding: "48px 0 24px" }}>
+                      <div style={{ maxWidth: 900, margin: "0 auto", padding: "0" }}>
+                        <h2 style={{ fontSize: "1.35rem", fontWeight: 800, marginBottom: 6, letterSpacing: "-0.01em" }}>
+                          Learn with Videos
+                        </h2>
+                        <p style={{ fontSize: "0.87rem", color: "var(--text-3)", marginBottom: 28 }}>
+                          Explore quantum key distribution, BB84 polarizations, and how physics guarantees secure cryptographic channels.
+                        </p>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                          {[
+                            {
+                              id: "8hNQyTdNil4",
+                              title: "Quantum Key Distribution, BB84 - simply explained",
+                              channel: "TüftelLab",
+                              desc: "A highly visual and intuitive explanation of quantum key distribution, polarizations, and how security is guaranteed by physics."
+                            },
+                            {
+                              id: "R0SOqLwLOR0",
+                              title: "Outsmarting Hackers: Quantum Key Distribution",
+                              channel: "Qiskit",
+                              desc: "IBM's researchers walk through the BB84 protocol, bases selection, sifting, and intercept-resend attack detection."
+                            }
+                          ].map((video) => (
+                            <div
+                              key={video.id}
+                              style={{
+                                background: "var(--bg-card)",
+                                border: "1px solid var(--border)",
+                                borderRadius: 14,
+                                overflow: "hidden",
+                                transition: "transform 0.2s ease, box-shadow 0.2s ease"
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.18)"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                            >
+                              <div style={{ position: "relative", paddingTop: "56.25%", background: "#000" }}>
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${video.id}?rel=0&modestbranding=1`}
+                                  title={video.title}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+                                />
+                              </div>
+                              <div style={{ padding: "14px 16px" }}>
+                                <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>{video.channel}</div>
+                                <h4 style={{ fontSize: "0.92rem", fontWeight: 700, margin: "0 0 6px", lineHeight: "1.35", color: "var(--text)" }}>{video.title}</h4>
+                                <p style={{ fontSize: "0.78rem", color: "var(--text-3)", margin: 0, lineHeight: "1.5" }}>{video.desc}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+
+                    {/* DETAILED alternating LONG SCROLL SECTIONS */}
+                    {bb84TopicsList.map((topic, index) => (
+                      <section
+                        key={topic.id}
+                        id={topic.id}
+                        className={`learn-section ${index % 2 === 1 ? "learn-section-reverse" : ""}`}
+                        style={{ display: "flex", gap: 40, alignItems: "center", margin: "80px 0", flexDirection: index % 2 === 1 ? "row-reverse" : "row" }}
+                      >
+                        <div className="learn-section-text" style={{ flex: 1.2 }}>
+                          <p className="learn-section-kicker" style={{ fontSize: "0.72rem", color: "var(--accent)", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px 0" }}>
+                            {qkd1.concept_kicker} {index + 1} {qkd1.concept_of} {bb84TopicsList.length}
+                          </p>
+                          <h2 style={{ fontSize: "1.8rem", fontWeight: 800, margin: "8px 0 12px 0", color: "var(--text)" }}>{topic.label}</h2>
+                          <p className="learn-section-tagline" style={{ fontSize: "0.95rem", color: "var(--text-3)", fontWeight: 500, marginBottom: 16 }}>{topic.tag}</p>
+                          <p className="learn-section-description" style={{ fontSize: "0.9rem", color: "var(--text-2)", lineHeight: 1.7, marginBottom: 20 }}>{topic.description}</p>
+
+                          <ul style={{ paddingLeft: 20, margin: 0 }}>
+                            {topic.bullets.map((bullet, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "0.88rem", color: "var(--text-2)", lineHeight: 1.6, marginBottom: 8 }}>
+                                {bullet}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="learn-section-visual" style={{ flex: 0.8 }}>
+                          <div className="learn-section-visual-box" style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 16, padding: 24, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                            <TheoryTopicVisual id={topic.id} />
+                          </div>
+                        </div>
+                      </section>
+                    ))}
+
+                    {/* MATHEMATICAL VECTOR PANEL */}
+                    <div className="learn-qubit-states" style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 16, padding: 30, marginTop: 60 }}>
+                      <h4 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 12, margin: 0 }}>
+                        {qkd1.concept_kicker} Matrix • {qkd1.math_vector_title}
+                      </h4>
+                      <p style={{ fontSize: "0.85rem", color: "var(--text-3)", marginTop: 8, marginBottom: 20, lineHeight: 1.5 }}>
+                        {qkd1.math_vector_desc}
+                      </p>
+                      <div className="state-item" style={{ padding: "12px 18px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <span className="state-label" style={{ fontSize: "0.85rem", fontWeight: 600 }}>States:</span>
+                        <span className="state-value" style={{ fontFamily: "monospace", fontSize: "0.85rem", color: "var(--accent)" }}>{qkd1.math_vector_def}</span>
+                      </div>
+                    </div>
+
+                    {/* FINAL CTA SECTION */}
+                    <section className="learn-final-cta" style={{ textAlign: "center", padding: "60px 0 20px 0" }}>
+                      <h2 style={{ fontSize: "1.8rem", fontWeight: 800, marginBottom: 12 }}>{qkd1.cta_title}</h2>
+                      <p style={{ color: "var(--text-3)", marginBottom: 24, maxWidth: 500, margin: "0 auto 24px auto", lineHeight: 1.6 }}>{qkd1.cta_desc}</p>
+                      <div className="learn-final-buttons" style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+                        <button className="learn-cta-primary btn-primary-wiser" onClick={() => setActiveTab("visual")} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                          {qkd1.cta_btn_playground}
+                        </button>
+                        <button className="learn-cta-secondary btn-secondary-wiser" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                          {qkd1.cta_btn_top}
+                        </button>
+                      </div>
+                    </section>
+                  </motion.div>
+                );
+              })()}
               {activeTab === "visual" && (
                 <motion.div key="visual-31" className="visual-lab-embed" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   {bb84SubExp === 1 && <Exp1BB84 />}
@@ -1901,10 +2499,14 @@ ${svgCircuit}
                 <motion.div key="sandbox-31" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   <h3 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 16 }}>BB84 Qiskit Sandbox</h3>
                   <p style={{ fontSize: "0.9rem", color: "var(--text-2)", marginBottom: 24, lineHeight: 1.7 }}>Copy and run in IBM Quantum Lab or local Qiskit to simulate BB84 programmatically.</p>
-                  <div style={{ background: "rgba(0,0,0,0.35)", border: "1px solid var(--border)", borderRadius: 12, padding: 24 }}>
+                  <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 24 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                       <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--accent)", fontFamily: "monospace" }}>bb84_protocol.py</span>
-                      <button onClick={() => navigator.clipboard.writeText(`from qiskit import QuantumCircuit, Aer, execute
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <a href={COLAB_LINKS["3.1"]} target="_blank" rel="noopener noreferrer" className="btn-primary-wiser" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 16px", borderRadius: 6, fontSize: "0.8rem", fontWeight: 600 }}>
+                          <Play size={12} /> Open in Colab
+                        </a>
+                        <button onClick={() => navigator.clipboard.writeText(`from qiskit import QuantumCircuit, Aer, execute
 import numpy as np
 
 n = 32
@@ -1929,8 +2531,9 @@ sifted_bob   = [bob_results[i]  for i in range(n) if alice_bases[i] == bob_bases
 errors = sum(a != b for a, b in zip(sifted_alice, sifted_bob))
 qber = errors / len(sifted_alice) * 100 if sifted_alice else 0
 print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if qber < 11 else 'ABORTED'}")`)} style={{ padding: "6px 16px", background: "var(--accent)", border: "none", color: "#fff", borderRadius: 6, fontSize: "0.8rem", fontWeight: 600, cursor: "pointer" }}>Copy Code</button>
+                      </div>
                     </div>
-                    <pre style={{ margin: 0, overflowX: "auto", fontFamily: "monospace", fontSize: "0.82rem", color: "#e2e8f0", lineHeight: 1.7 }}>{`from qiskit import QuantumCircuit, Aer, execute
+                    <pre style={{ margin: 0, overflowX: "auto", fontFamily: "monospace", fontSize: "0.82rem", color: "var(--text-2)", lineHeight: 1.7 }}>{`from qiskit import QuantumCircuit, Aer, execute
 import numpy as np
 
 n = 32
@@ -2226,33 +2829,133 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
           </header>
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: "32px", minHeight: 400 }}>
             <AnimatePresence mode="wait">
-              {activeTab === "theory" && (
-                <motion.div key="theory-32" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h3 style={{ fontSize: "1.35rem", fontWeight: 700, marginBottom: 20, color: "var(--accent)" }}>
-                    {["", "Experiment 1: Ideal B92 Protocol", "Experiment 2: Noise Injection & Channel Imperfections", "Experiment 3: Eavesdropping Signature in B92", "Experiment 4: Multi-Parameter Disturbance Analysis"][b92SubExp]}
-                  </h3>
-                  {b92SubExp === 1 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>The B92 protocol, proposed by Charles Bennett in 1992, simplifies quantum key distribution to use only two non-orthogonal quantum states — one for bit 0 and one for bit 1. While simpler than BB84, it achieves the same unconditional security guarantee rooted in the quantum No-Cloning Theorem.</p>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>State Encoding</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>Alice maps bit <strong>0</strong> → 0° (horizontal) polarization and bit <strong>1</strong> → 45° (diagonal) polarization. These states are non-orthogonal, so it is impossible to perfectly distinguish them without disturbing the quantum state.</p></div>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>Conclusive vs. Inconclusive Measurements</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>Bob uses cross-polarized filters. A click at the 90° filter conclusively identifies that Alice sent bit 1. A click at −45° identifies bit 0. No click (erasure) means the measurement was inconclusive — roughly 50% of all ideal transmissions. Only conclusive events form the sifted key.</p></div>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> In an ideal B92 channel with no Eve, QBER = 0%. The ~50% erasure rate is correct and expected — it is the fundamental trade-off of using only two states.</p></div>
-                  </div>)}
-                  {b92SubExp === 2 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>Real fiber-optic quantum channels introduce depolarizing noise, photon loss from attenuation, and phase errors. These imperfections convert some valid conclusive measurements into errors, raising the QBER even without any eavesdropper.</p>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>Channel Loss Model</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>Fiber attenuation is approximately 0.2 dB/km at 1550 nm. Over 50 km, this leads to ~10 dB loss — only 1 in 10 photons reaches Bob. The remaining photons are absorbed as "lost" events, dramatically reducing key rate.</p></div>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Dial in channel noise and distance to observe how real-world imperfections affect key rate and QBER simultaneously.</p></div>
-                  </div>)}
-                  {b92SubExp === 3 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>In B92, Eve faces a harder challenge — the two states are non-orthogonal, so any measurement attempt has a non-zero probability of misidentifying the state. This introduces errors into the conclusive click events that Bob and Alice detect as elevated QBER.</p>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>B92 Security Bound</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>The standard abort threshold is <strong>11% QBER</strong>. Any excess above channel noise baseline signals eavesdropping. Slide Eve's interception level and observe the QBER cross this limit.</p></div>
-                  </div>)}
-                  {b92SubExp === 4 && (<div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 780 }}>
-                    <p style={{ fontSize: "0.95rem", lineHeight: 1.8, color: "var(--text-2)" }}>This advanced experiment combines all disturbance parameters simultaneously: channel noise, photon loss, and Eve's interception activity — mirroring the complexity of a real deployed QKD system under adversarial conditions.</p>
-                    <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}><h5 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>Parameter Interactions</h5><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}>Channel noise raises baseline QBER. Distance reduces key rate. Eve raises QBER further. The challenge is separating Eve's contribution from channel noise — necessitating privacy amplification, error correction, and statistical authentication.</p></div>
-                    <div style={{ background: "rgba(199,162,39,0.08)", borderLeft: "4px solid #C9A227", padding: 16, borderRadius: 8 }}><p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "var(--text-2)", margin: 0 }}><strong>Key Insight:</strong> Find the maximum Eve activity that can stay undetected given a noisy channel. This is the fundamental security margin engineering problem in QKD deployment.</p></div>
-                  </div>)}
-                </motion.div>
-              )}
+              {activeTab === "theory" && (() => {
+                const qkd2 = TRANSLATIONS_EXP_3_2[lang];
+                const b92TopicsList = [
+                  { id: "b92-baseline", label: qkd2.topics["b92-baseline"].label, tag: qkd2.topics["b92-baseline"].tag, bullets: qkd2.topics["b92-baseline"].bullets, description: qkd2.topics["b92-baseline"].description },
+                  { id: "conclusive-sifting", label: qkd2.topics["conclusive-sifting"].label, tag: qkd2.topics["conclusive-sifting"].tag, bullets: qkd2.topics["conclusive-sifting"].bullets, description: qkd2.topics["conclusive-sifting"].description },
+                  { id: "b92-noise", label: qkd2.topics["b92-noise"].label, tag: qkd2.topics["b92-noise"].tag, bullets: qkd2.topics["b92-noise"].bullets, description: qkd2.topics["b92-noise"].description },
+                  { id: "b92-eavesdropping", label: qkd2.topics["b92-eavesdropping"].label, tag: qkd2.topics["b92-eavesdropping"].tag, bullets: qkd2.topics["b92-eavesdropping"].bullets, description: qkd2.topics["b92-eavesdropping"].description },
+                ];
+                return (
+                  <motion.div key="theory-32" className="learn-page" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                    {/* HERO TITLE SECTION */}
+                    <header className="learn-hero" style={{ padding: "40px 0", marginBottom: "40px", borderBottom: "1px solid var(--border)" }}>
+                      <div className="learn-hero-inner">
+                        <span className="learn-pill" style={{ background: "rgba(6, 182, 212, 0.1)", color: "#06b6d4", padding: "4px 12px", borderRadius: 100, fontSize: "0.75rem", fontWeight: 700 }}>Experiment 3.2</span>
+                        <h1 style={{ fontSize: "2.2rem", fontWeight: 800, margin: "12px 0 8px 0", color: "var(--text)" }}>{qkd2.hero_title}</h1>
+                        <p className="learn-hero-sub" style={{ fontSize: "1rem", color: "var(--text-3)", maxWidth: 680, lineHeight: 1.6, margin: 0 }}>{qkd2.hero_sub}</p>
+
+                        <div className="learn-hero-buttons" style={{ display: "flex", gap: 12, marginTop: 24 }}>
+                          <button className="learn-cta-primary btn-primary-wiser" onClick={() => setActiveTab("visual")} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                            {qkd2.btn_launch_playground}
+                          </button>
+                          <button className="learn-cta-secondary btn-secondary-wiser" onClick={() => {
+                            const el = document.getElementById("b92-baseline");
+                            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                          }} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                            {qkd2.btn_start_learning}
+                          </button>
+                        </div>
+                      </div>
+                    </header>
+
+                    {/* CORE PRINCIPLES CONTAINER */}
+                    <section className="learn-topics" style={{ marginBottom: 60 }}>
+                      <div className="learn-topics-header" style={{ marginBottom: 30 }}>
+                        <h2 style={{ fontSize: "1.6rem", fontWeight: 700 }}>{qkd2.section_title}</h2>
+                        <p style={{ color: "var(--text-3)" }}>{qkd2.section_sub}</p>
+                      </div>
+
+                      {/* EXPANDABLE CARDS GRID */}
+                      <div className="learn-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+                        {b92TopicsList.map((t) => (
+                          <div
+                            key={t.id}
+                            className="learn-card"
+                            style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, cursor: "pointer", transition: "transform 0.2s" }}
+                            onClick={() => {
+                              const el = document.getElementById(t.id);
+                              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }}
+                          >
+                            <div className="learn-card-visual-placeholder" style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}>
+                              <TheoryTopicVisual id={t.id} />
+                            </div>
+                            <div className="learn-card-body">
+                              <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>{t.label}</h3>
+                              <p style={{ fontSize: "0.82rem", color: "var(--text-3)", lineHeight: 1.5, margin: 0 }}>{t.tag}</p>
+                              <span className="learn-card-link" style={{ fontSize: "0.75rem", color: "var(--accent)", fontWeight: 700, display: "block", marginTop: 12 }}>
+                                {qkd2.quick_summary} &rarr;
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    {/* DETAILED alternating LONG SCROLL SECTIONS */}
+                    {b92TopicsList.map((topic, index) => (
+                      <section
+                        key={topic.id}
+                        id={topic.id}
+                        className={`learn-section ${index % 2 === 1 ? "learn-section-reverse" : ""}`}
+                        style={{ display: "flex", gap: 40, alignItems: "center", margin: "80px 0", flexDirection: index % 2 === 1 ? "row-reverse" : "row" }}
+                      >
+                        <div className="learn-section-text" style={{ flex: 1.2 }}>
+                          <p className="learn-section-kicker" style={{ fontSize: "0.72rem", color: "var(--accent)", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px 0" }}>
+                            {qkd2.concept_kicker} {index + 1} {qkd2.concept_of} {b92TopicsList.length}
+                          </p>
+                          <h2 style={{ fontSize: "1.8rem", fontWeight: 800, margin: "8px 0 12px 0", color: "var(--text)" }}>{topic.label}</h2>
+                          <p className="learn-section-tagline" style={{ fontSize: "0.95rem", color: "var(--text-3)", fontWeight: 500, marginBottom: 16 }}>{topic.tag}</p>
+                          <p className="learn-section-description" style={{ fontSize: "0.9rem", color: "var(--text-2)", lineHeight: 1.7, marginBottom: 20 }}>{topic.description}</p>
+
+                          <ul style={{ paddingLeft: 20, margin: 0 }}>
+                            {topic.bullets.map((bullet, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "0.88rem", color: "var(--text-2)", lineHeight: 1.6, marginBottom: 8 }}>
+                                {bullet}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="learn-section-visual" style={{ flex: 0.8 }}>
+                          <div className="learn-section-visual-box" style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 16, padding: 24, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                            <TheoryTopicVisual id={topic.id} />
+                          </div>
+                        </div>
+                      </section>
+                    ))}
+
+                    {/* MATHEMATICAL VECTOR PANEL */}
+                    <div className="learn-qubit-states" style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 16, padding: 30, marginTop: 60 }}>
+                      <h4 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 12, margin: 0 }}>
+                        {qkd2.concept_kicker} Matrix • {qkd2.math_vector_title}
+                      </h4>
+                      <p style={{ fontSize: "0.85rem", color: "var(--text-3)", marginTop: 8, marginBottom: 20, lineHeight: 1.5 }}>
+                        {qkd2.math_vector_desc}
+                      </p>
+                      <div className="state-item" style={{ padding: "12px 18px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <span className="state-label" style={{ fontSize: "0.85rem", fontWeight: 600 }}>States:</span>
+                        <span className="state-value" style={{ fontFamily: "monospace", fontSize: "0.85rem", color: "var(--accent)" }}>{qkd2.math_vector_def}</span>
+                      </div>
+                    </div>
+
+                    {/* FINAL CTA SECTION */}
+                    <section className="learn-final-cta" style={{ textAlign: "center", padding: "60px 0 20px 0" }}>
+                      <h2 style={{ fontSize: "1.8rem", fontWeight: 800, marginBottom: 12 }}>{qkd2.cta_title}</h2>
+                      <p style={{ color: "var(--text-3)", marginBottom: 24, maxWidth: 500, margin: "0 auto 24px auto", lineHeight: 1.6 }}>{qkd2.cta_desc}</p>
+                      <div className="learn-final-buttons" style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+                        <button className="learn-cta-primary btn-primary-wiser" onClick={() => setActiveTab("visual")} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                          {qkd2.cta_btn_playground}
+                        </button>
+                        <button className="learn-cta-secondary btn-secondary-wiser" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} style={{ padding: "10px 20px", fontSize: "0.85rem", fontWeight: 700 }}>
+                          {qkd2.cta_btn_top}
+                        </button>
+                      </div>
+                    </section>
+                  </motion.div>
+                );
+              })()}
               {activeTab === "visual" && (
                 <motion.div key="visual-32" className="visual-lab-embed" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   {b92SubExp === 1 && <B92Experiment1 />}
@@ -2265,10 +2968,14 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                 <motion.div key="sandbox-32" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   <h3 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 16 }}>B92 Qiskit Sandbox</h3>
                   <p style={{ fontSize: "0.9rem", color: "var(--text-2)", marginBottom: 24, lineHeight: 1.7 }}>Copy and run in IBM Quantum Lab or local Qiskit to simulate B92 programmatically.</p>
-                  <div style={{ background: "rgba(0,0,0,0.35)", border: "1px solid var(--border)", borderRadius: 12, padding: 24 }}>
+                  <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border)", borderRadius: 12, padding: 24 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                       <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--accent)", fontFamily: "monospace" }}>b92_protocol.py</span>
-                      <button onClick={() => navigator.clipboard.writeText(`from qiskit import QuantumCircuit, Aer, execute
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <a href={COLAB_LINKS["3.2"]} target="_blank" rel="noopener noreferrer" className="btn-primary-wiser" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 16px", borderRadius: 6, fontSize: "0.8rem", fontWeight: 600 }}>
+                          <Play size={12} /> Open in Colab
+                        </a>
+                        <button onClick={() => navigator.clipboard.writeText(`from qiskit import QuantumCircuit, Aer, execute
 import numpy as np
 
 n = 32
@@ -2295,8 +3002,9 @@ for i in range(n):
 
 qber = sum(a!=b for a,b in zip(sifted_alice,sifted_bob)) / max(len(sifted_alice),1) * 100
 print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if qber < 11 else 'ABORTED'}")`)} style={{ padding: "6px 16px", background: "var(--accent)", border: "none", color: "#fff", borderRadius: 6, fontSize: "0.8rem", fontWeight: 600, cursor: "pointer" }}>Copy Code</button>
+                      </div>
                     </div>
-                    <pre style={{ margin: 0, overflowX: "auto", fontFamily: "monospace", fontSize: "0.82rem", color: "#e2e8f0", lineHeight: 1.7 }}>{`from qiskit import QuantumCircuit, Aer, execute
+                    <pre style={{ margin: 0, overflowX: "auto", fontFamily: "monospace", fontSize: "0.82rem", color: "var(--text-2)", lineHeight: 1.7 }}>{`from qiskit import QuantumCircuit, Aer, execute
 import numpy as np
 
 n = 32
@@ -2707,6 +3415,77 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                         </div>
                       </button>
                     ))}
+                  </div>
+                </section>
+
+                {/* YOUTUBE VIDEO RESOURCES */}
+                <section style={{ padding: "48px 0 24px" }}>
+                  <div style={{ maxWidth: 900, margin: "0 auto", padding: "0" }}>
+                    <h2 style={{ fontSize: "1.35rem", fontWeight: 800, marginBottom: 6, letterSpacing: "-0.01em" }}>
+                      Learn with Videos
+                    </h2>
+                    <p style={{ fontSize: "0.87rem", color: "var(--text-3)", marginBottom: 28 }}>
+                      {isTeleport
+                        ? "Explore quantum state teleportation, Bell measurements, and quantum channels through expert-curated videos."
+                        : "Explore superdense coding protocols, channel capacity limits, and joint Bell state decoding through expert-curated videos."}
+                    </p>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                      {(isTeleport ? [
+                        {
+                          id: "DbbWx2COU0E",
+                          title: "Bell States & Quantum Teleportation",
+                          channel: "TED-ED",
+                          desc: "A deep dive into the four Bell states, quantum correlations, and how they enable quantum teleportation protocols."
+                        },
+                        {
+                          id: "jxqnzltpDdE",
+                          title: "How Quantum Teleportation Really Works",
+                          channel: "Qiskit",
+                          desc: "Learn how to build and execute a quantum teleportation circuit on IBM Quantum hardware."
+                        }
+                      ] : [
+                        {
+                          id: "dAXdJpgiMDQ",
+                          title: "Quantum Superdense Coding",
+                          channel: "Quantum Soar",
+                          desc: ""
+                        },
+                        {
+                          id: "UrAZHBwIAFQ",
+                          title: "Superdense Coding",
+                          channel: "QuTech",
+                          desc: ""
+                        }
+                      ]).map((video) => (
+                        <div
+                          key={video.id}
+                          style={{
+                            background: "var(--bg-card)",
+                            border: "1px solid var(--border)",
+                            borderRadius: 14,
+                            overflow: "hidden",
+                            transition: "transform 0.2s ease, box-shadow 0.2s ease"
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.18)"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                        >
+                          <div style={{ position: "relative", paddingTop: "56.25%", background: "#000" }}>
+                            <iframe
+                              src={`https://www.youtube.com/embed/${video.id}?rel=0&modestbranding=1`}
+                              title={video.title}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+                            />
+                          </div>
+                          <div style={{ padding: "14px 16px" }}>
+                            <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>{video.channel}</div>
+                            <h4 style={{ fontSize: "0.92rem", fontWeight: 700, margin: "0 0 6px", lineHeight: "1.35", color: "var(--text)" }}>{video.title}</h4>
+                            <p style={{ fontSize: "0.78rem", color: "var(--text-3)", margin: 0, lineHeight: "1.5" }}>{video.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </section>
 
@@ -3290,20 +4069,40 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                     </p>
                   </div>
 
-                  <button
-                    onClick={handleCopyCode}
-                    className="btn-secondary-wiser"
-                    style={{
-                      padding: "8px 16px",
-                      fontSize: "0.8rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8
-                    }}
-                  >
-                    {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                    {copied ? "Copied!" : "Copy Code"}
-                  </button>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <a
+                      href={isTeleport ? COLAB_LINKS["2.1"] : COLAB_LINKS["2.2"]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary-wiser"
+                      style={{
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "8px 16px",
+                        fontSize: "0.8rem",
+                        borderRadius: 6,
+                        fontWeight: 600
+                      }}
+                    >
+                      <Play size={12} /> Open in Colab
+                    </a>
+                    <button
+                      onClick={handleCopyCode}
+                      className="btn-secondary-wiser"
+                      style={{
+                        padding: "8px 16px",
+                        fontSize: "0.8rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8
+                      }}
+                    >
+                      {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                      {copied ? "Copied!" : "Copy Code"}
+                    </button>
+                  </div>
                 </div>
 
                 <pre

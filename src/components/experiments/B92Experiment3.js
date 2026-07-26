@@ -2,7 +2,7 @@
 // src/B92Experiment3.js
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import QuantumChannelB92 from "./QuantumChannelB92";
-import "./Experiment1.css";
+import "./B92Experiment1.css";
 import { initializeProtocol } from "./QuantumChannelLogicB92";
 import KeyAnalysisPanelB92 from "./KeyAnalysisPanelB92";
 import "./KeyAnalysisPanel.css";

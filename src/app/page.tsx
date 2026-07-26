@@ -10,6 +10,8 @@ import {
   Layers, Cpu, Radio, RotateCcw,
 } from "lucide-react";
 import TRANSLATIONS, { LangCode, LANG_META } from "@/data/translations";
+import Link from "next/link";
+import { useAuth } from "@/app/AuthProvider";
 
 // ─────────────────────────────────────────────
 // Framer Motion helpers
@@ -189,6 +191,7 @@ interface NavbarProps {
 }
 
 function Navbar({ dark, setDark, lang, setLang, dict }: NavbarProps) {
+  const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -315,6 +318,24 @@ function Navbar({ dark, setDark, lang, setLang, dict }: NavbarProps) {
                   </AnimatePresence>
                 </motion.div>
               </motion.button>
+            </div>
+
+            {/* Auth CTA Link */}
+            <div style={{ marginLeft: 6 }}>
+              {user ? (
+                <div className="d-flex align-items-center gap-3">
+                  <Link href="/experiments" className="btn-primary-wiser" style={{ padding: "6px 14px", fontSize: "0.8rem", borderRadius: 8, height: "auto", textDecoration: "none" }}>
+                    Dashboard
+                  </Link>
+                  <button onClick={logout} style={{ background: "none", border: "none", color: "#f87171", fontSize: "0.78rem", fontWeight: 700, padding: 0, cursor: "pointer" }}>
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link href="/login" className="btn-primary-wiser" style={{ padding: "6px 14px", fontSize: "0.8rem", borderRadius: 8, height: "auto", textDecoration: "none" }}>
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -1037,8 +1058,26 @@ export default function LandingPage() {
   // Get active translations dictionary
   const dict = TRANSLATIONS[lang];
 
-  // Apply theme class to document root
+  // Load preferences from localStorage on mount
   useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setDark(savedTheme === "dark");
+    }
+    const savedLang = localStorage.getItem("lang");
+    if (savedLang) {
+      setLang(savedLang as LangCode);
+    }
+  }, []);
+
+  // Save language to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
+
+  // Apply theme class to document root and save to localStorage
+  useEffect(() => {
+    localStorage.setItem("theme", dark ? "dark" : "light");
     if (dark) {
       document.documentElement.classList.add("dark-theme");
       document.documentElement.classList.remove("light-theme");
@@ -1048,9 +1087,10 @@ export default function LandingPage() {
     }
   }, [dark]);
 
-  // Set default dark on mount
+  // Initialize theme class on mount
   useEffect(() => {
-    document.documentElement.classList.add("dark-theme");
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.classList.add(savedTheme === "dark" ? "dark-theme" : "light-theme");
   }, []);
 
   return (

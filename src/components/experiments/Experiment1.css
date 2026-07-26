@@ -1,7 +1,26 @@
 /* src/Experiment1.css - Compact layout: Header + Controls + Quantum Channel + Dark Table */
 
-/* ===== GLOBAL RESET ===== */
-* { box-sizing: border-box; }
+/* ===== GLOBAL RESET & FONT UNIFICATION ===== */
+* {
+  box-sizing: border-box;
+}
+
+.lab-container,
+.lab-container button,
+.lab-container select,
+.lab-container input,
+.lab-container option,
+.lab-container a,
+.lab-container textarea,
+.key-analysis-container,
+.key-analysis-container button,
+.key-analysis-container select,
+.key-analysis-container input,
+.key-analysis-container option,
+.key-analysis-container a,
+.key-analysis-container textarea {
+  font-family: var(--font-sans, 'Inter', system-ui, -apple-system, sans-serif) !important;
+}
 
 /* ===== CORE LAYOUT ===== */
 
@@ -15,12 +34,13 @@
 .lab-header.hero {
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 22px; margin-bottom: 18px;
-  background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);
+  background: var(--bg-card-glass); border-radius: var(--radius); border: 1px solid var(--border);
   backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-sm);
 }
 .lab-header.hero h1 {
   margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.01em;
-  text-shadow: 0 0 12px rgba(255,255,255,0.06);
+  color: var(--text);
 }
 .lab-header.hero .lab-subtitle { display:none; } /* removed extra subtitle for compact view */
 
@@ -66,45 +86,49 @@
 
 /* ===== CONTROLS (left) ===== */
 .controls-left-column {
-  background: rgba(255,255,255,0.01); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.05);
-  position: sticky; top: 100px; height: calc(100vh - 140px); overflow:auto;
+  background: var(--bg-card); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border) !important;
+  position: sticky; top: 140px; height: calc(100vh - 180px); overflow:auto;
+  box-shadow: var(--shadow-sm);
 }
-.controls-left-column h3 { margin: 0 0 12px; font-size: 1rem; letter-spacing: 0.06em; }
+.controls-left-column h3 { margin: 0 0 12px; font-size: 1rem; letter-spacing: 0.06em; color: var(--text); }
 .control-row {
-  background: rgba(0,0,0,0.35); padding:12px; margin-bottom:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.03);
+  background: var(--bg-canvas); padding:12px; margin-bottom:12px; border-radius:10px; border:1px solid var(--border);
 }
-.control-row label { display:block; margin-bottom:8px; font-weight:700; font-size:0.92rem; color:#fff; }
+.control-row label { display:block; margin-bottom:8px; font-weight:700; font-size:0.92rem; color:var(--text-2); }
 .slider-row { display:flex; gap:10px; align-items:center; }
-.exp-slider { flex:1; height:6px; border-radius:4px; background:rgba(255,255,255,0.08); }
-.exp-slider::-webkit-slider-thumb { -webkit-appearance:none; width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 8px rgba(255,255,255,0.12); }
-.slider-value { min-width:56px; text-align:right; background:rgba(255,255,255,0.04); padding:6px 8px; border-radius:8px; font-weight:700; }
+.exp-slider { flex:1; height:6px; border-radius:4px; background:var(--border); -webkit-appearance: none; appearance: none; outline: none; }
+.exp-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance: none; width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow); cursor: pointer; }
+.slider-value { min-width:56px; text-align:right; background:var(--bg-card); border: 1px solid var(--border); color: var(--text); padding:6px 8px; border-radius:8px; font-weight:700; }
 
 /* action buttons inside controls */
 .control-actions { display:flex; gap:10px; flex-direction:column; margin-top:8px; }
-.exp-btn { padding:10px 12px; border-radius:10px; font-weight:700; cursor:pointer; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#fff; }
-.exp-btn-primary { background:#fff; color:#000; box-shadow:0 10px 30px rgba(255,255,255,0.03); border-color:#fff; }
-.exp-btn-ghost { background:transparent; color:rgba(255,255,255,0.9); }
+.exp-btn { padding:10px 12px; border-radius:10px; font-weight:700; cursor:pointer; border:1px solid var(--border); background:var(--bg-card); color:var(--text-2); }
+.exp-btn-primary { background:var(--accent); color:#fff; box-shadow:0 4px 14px var(--accent-glow); border-color:var(--accent); }
+.exp-btn-ghost { background:transparent; color:var(--accent); border: 1px solid var(--accent); }
 
 /* status */
-#transmission-status { margin-top:12px; padding:10px; border-radius:8px; background:rgba(0,255,100,0.05); border:1px solid rgba(0,255,100,0.08); font-family: "SF Mono", monospace; font-weight:600; }
+#transmission-status { margin-top:12px; padding:10px; border-radius:8px; background:var(--bg-canvas); border:1px solid var(--border); font-family: "SF Mono", monospace; font-weight:600; color: var(--text); }
 
 /* ===== CHANNEL (right) ===== */
 .channel-right-area { display:flex; flex-direction:column; gap:12px; }
 .channel-hero {
-  background: transparent;     /* remove background so it blends */
-  border-radius: 0;            /* no corners */
-  padding: 0;                  /* remove internal padding */
-  min-height: auto;            /* shrink to fit content */
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  min-height: 320px;
   display:flex;
   flex-direction:column;
-  gap: 0;                      /* remove vertical spacing */
-  border: none !important;     /* <-- removes border fully */
-  margin-top: 0;               /* no extra margin */
+  gap: 14px;
+  border: 1px solid var(--border) !important;
+  align-items:stretch;
+  margin-top: 8px;
+  box-shadow: var(--shadow-sm);
 }
 
 .channel-title-pill {
-  align-self:center; background:#000; border-radius:999px; padding:10px 26px; font-weight:900; letter-spacing:0.12em; border:1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  align-self:center; background:var(--bg-canvas); border-radius:999px; padding:10px 26px; font-weight:900; letter-spacing:0.12em; border:1px solid var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
 }
 .channel-stage { flex:1 1 auto; display:flex; align-items:center; justify-content:center; min-height:300px; }
 
@@ -115,19 +139,20 @@
 /* ===== TABLE (dark) ===== */
 .table-panel { padding:12px 14px; margin-top:6px; }
 .table-responsive {
-  background: #0b0b0b; border-radius:12px; border:1px solid rgba(255,255,255,0.04); padding:8px; overflow-x:auto;
+  background: var(--bg-card); border-radius:12px; border:1px solid var(--border); padding:8px; overflow-x:auto;
+  box-shadow: var(--shadow-sm);
 }
 /* when more rows exist switch to vertical scroll inside table body */
 .table-responsive.scrollable { max-height: 320px; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling: touch; padding-right:6px; }
 
 /* table visuals: fully dark */
-.data-table { width:100%; border-collapse: collapse; color:#fff; font-size:0.92rem; }
-.data-table thead { position: sticky; top:0; background: #111; z-index:6; }
-.data-table th { padding:12px 10px; text-align:left; font-weight:700; color:rgba(255,255,255,0.9); font-size:0.85rem; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.04); }
-.data-table td { padding:12px 10px; font-family: "SF Mono", monospace; color: rgba(255,255,255,0.95); border-bottom:1px solid rgba(255,255,255,0.03); background: transparent; }
+.data-table { width:100%; border-collapse: collapse; color:var(--text); font-size:0.92rem; }
+.data-table thead { position: sticky; top:0; background: var(--bg-canvas); z-index:6; }
+.data-table th { padding:12px 10px; text-align:left; font-weight:700; color:var(--text-2); font-size:0.85rem; text-transform:uppercase; border-bottom:1px solid var(--border); }
+.data-table td { padding:12px 10px; font-family: "SF Mono", monospace; color: var(--text-2); border-bottom:1px solid var(--border-subtle); background: transparent; }
 
 /* rows remain dark */
-.data-table tbody tr:hover { background: rgba(255,255,255,0.02); cursor:pointer; }
+.data-table tbody tr:hover { background: var(--bg-canvas); cursor:pointer; }
 
 /* small screens */
 
@@ -230,7 +255,7 @@
   margin-bottom: 6px;
   font-weight: 800;
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.95);
+  color: var(--text-2);
   text-align: center;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -245,7 +270,7 @@
   margin-bottom: 6px;
   font-weight: 800;
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.95);
+  color: var(--text-2);
   text-align: center;
 }
 
@@ -282,8 +307,8 @@
 
   /* keep the round shape if you want the dot, but remove luminous background */
   background: transparent !important;
-  border: 1px solid rgba(255,255,255,0.06) !important; /* optional thin outline so photon is still visible */
-  color: #ffffff !important;
+  border: 1px solid var(--border) !important; /* optional thin outline so photon is still visible */
+  color: var(--text) !important;
 
   /* remove any heavy blur/scale that looks like a glow */
   -webkit-backdrop-filter: none !important;
@@ -299,23 +324,23 @@
 
 /* ===== Angle label: dark background behind degree text ===== */
 .photon-angle {
-  background: rgba(0,0,0,0.85);  /* solid black-ish background */
-  color: #ffffff !important;     /* white degree text */
+  background: var(--bg-canvas);  /* solid background */
+  color: var(--text) !important;     /* degree text */
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 12px;
   line-height: 1;
   display: inline-block;
   box-shadow: none !important;   /* ensure no glow behind the label */
-  border: 1px solid rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
   z-index: 40;
 }
 
 /* If angle is appended elsewhere or uses inline white bg, override */
 .photon-angle[style],
 .photon[style] .photon-angle[style] {
-  background: rgba(0,0,0,0.85) !important;
-  color: #fff !important;
+  background: var(--bg-canvas) !important;
+  color: var(--text) !important;
 }
 /* Center the 'Experiment Controls' heading */
 .controls-left-column h3 {
@@ -323,9 +348,9 @@
   width: 100%;
   display: block;
 }
-/* === Thin white border ONLY for the controls panel === */
+/* === Thin border ONLY for the controls panel === */
 .controls-left-column {
-  border: 1px solid rgba(255,255,255,0.55) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 12px; /* keep your existing rounded corners */
 }
 /* REMOVE THESE */
@@ -339,27 +364,31 @@
 }
 */
 
-/* Make all status bars pure black */
+/* Make all status bars match theme */
 #transmission-status,
 #quantum-channel-status,
 #transmission-status * {
-  background: #000 !important;
-  border: 1px solid rgba(255,255,255,0.15) !important;
-  color: #fff !important;
+  background: var(--bg-canvas) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
 }
-/* White background buttons */
+/* Unified buttons */
 .exp-btn-primary,
 .channel-actions .exp-btn {
-  background: #ffffff !important;
-  color: #000 !important;
-  border: 1px solid #ffffff !important;
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: 1px solid var(--accent) !important;
+  box-shadow: 0 4px 14px var(--accent-glow) !important;
 }
 
-/* Specifically force Reset to Ideal, Next Photon, All Photons to white */
+/* Specifically force Reset to Ideal, Next Photon, All Photons to accent outline/ghost */
 .exp-btn-ghost {
-  background: #ffffff !important;
-  color: #000 !important;
-  border: 1px solid #ffffff !important;
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent) !important;
+}
+.exp-btn-ghost:hover {
+  background: var(--accent-glow) !important;
 }
 
 /* === The actual centered pop-up === */
@@ -394,11 +423,12 @@
 .slider-modal {
   width: 520px;                  /* was ~300 → now MUCH bigger */
   padding: 32px 40px;
-  background: rgba(255, 80, 80, 0.15); /* transparent light red */
-  border: 1px solid rgba(255, 120, 120, 0.4);
+  background: var(--bg-card);
+  border: 1px solid #f87171;
   border-radius: 18px;
   text-align: center;
-  box-shadow: 0 0 40px rgba(255, 0, 0, 0.25);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
 }
 
 /* Dim and freeze controls */
@@ -433,8 +463,8 @@
 
 /* default chart card sizing (flexible) */
 .graph-card {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.6);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   padding: 16px;
   border-radius: 12px;
   flex: 1 1 0;            /* equal-width expansion across wide screens */
@@ -444,12 +474,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Two-bar card: intentionally larger boxes for emphasis */
 .two-bar-card {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.6);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   padding: 55px;           /* tall interior padding to make cards visually large */
   border-radius: 10px;
   min-width: 450px;        /* wide boxes as requested */
@@ -458,6 +489,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* titles / labels */
@@ -466,7 +498,7 @@
 .chart-title {
   font-weight: 800;
   font-size: 1.04rem;
-  color: #fff;
+  color: var(--text);
   text-align: center;
 }
 
@@ -482,23 +514,23 @@
 }
 
 /* bar visuals */
-.two-bar-bg { fill: #111; stroke: #333; }
+.two-bar-bg { fill: var(--bg-canvas); stroke: var(--border); }
 .two-bar-fill,
-.chart-bar { fill: #fff; }
+.chart-bar { fill: var(--accent) !important; }
 
 /* axis / caption styles (kept subtle & scientific) */
 .two-bar-xlabel,
 .chart-tick-label {
-  font-family: Inter, sans-serif;
+  font-family: var(--font-sans, 'Inter', system-ui, -apple-system, sans-serif);
   font-size: 150px;
-  fill: #ddd;
+  fill: var(--text-3);
   text-anchor: middle;
 }
 
 /* small QBER box styling */
 .graph-card .qber-box {
-  background: #0b0b0b;
-  border: 1px solid rgba(255,255,255,0.04);
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px;
   height: 56px;
@@ -526,30 +558,30 @@
   .graphs-row-wrapper { margin-top: 8px; max-width: 100%; padding: 8px; }
 }
 .chart-axis-main {
-  stroke: #fff;
+  stroke: var(--text-3);
   stroke-width: 3;
 }
 
 .chart-axis-arrow {
-  stroke: #fff;
+  stroke: var(--text-3);
   stroke-width: 3;
   fill: none;
 }
 
 .chart-gridline {
-  stroke: rgba(255,255,255,0.25);
+  stroke: var(--border);
   stroke-width: 1;
 }
 
 .chart-axis-label {
-  fill: #fff;
+  fill: var(--text);
   font-size: 14px;
   font-weight: 700;
   text-anchor: middle;
 }
 
 .chart-x-rotated {
-  fill: #ddd;
+  fill: var(--text-3);
   font-size: 13px;
   transform: rotate(90deg);
   transform-box: fill-box;
@@ -568,7 +600,7 @@
 
 /* title that sits above the box (outside) */
 .chart-title-outside {
-  color: #fff;
+  color: var(--text);
   font-weight: 900;
   font-size: 1.06rem;
   text-align: center;
@@ -578,8 +610,8 @@
 
 /* chart-card becomes the frame (box) that holds the svg and fills available height */
 .chart-card {
-  background: transparent;
-  border: 1px solid #fff;   /* visible white border as requested */
+  background: var(--bg-card);
+  border: 1px solid var(--border);   /* visible border */
   padding: 12px;
   border-radius: 12px;
   display: flex;
@@ -602,7 +634,7 @@
 .graphs-row { align-items: flex-start; }
 
 /* Slightly reduce internal chart padding so axes sit closer to border */
-.chart-gridline { stroke: rgba(255,255,255,0.08); }
+.chart-gridline { stroke: var(--border); }
 .chart-axis-main { stroke-width: 2.5; }
 .chart-axis-arrow { stroke-width: 2.5; }
 
@@ -624,14 +656,14 @@
 .chart-axis-label   {
   font-size: 20px;
   font-weight: 800;
-  fill: #fff;
+  fill: var(--text);
 } /* axis titles */
 .chart-tick-label   {
   font-size: 18px;           /* bigger tick numbers and x-labels */
   font-weight: 700;          /* heavier so they look thicker */
-  fill: #ddd;
+  fill: var(--text-3);
   letter-spacing: 0.02em;    /* a little breathing room */
-  font-family: Inter, sans-serif;
+  font-family: var(--font-sans, 'Inter', system-ui, -apple-system, sans-serif);
 }/* tick numbers */
 .chart-title-outside{ font-size: 22px; } /* chart title above box */
 .chart-bar-value    {
@@ -641,7 +673,7 @@
 .qber-value         { font-size: 24px; } /* large QBER value */
 .chart-axis-main { stroke-width: 3.5; }   /* thicker axis lines */
 .chart-axis-arrow { stroke-width: 3.5; }  /* thicker arrowheads */
-.chart-gridline { stroke: rgba(255,255,255,0.06); stroke-width: 1; }
+.chart-gridline { stroke: var(--border); stroke-width: 1; }
 .graphs-row { gap:30px; justify-content: space-between; }
 .chart-wrapper { min-width: 360px; } /* ensures each card expands nicely */
 .chart-line { stroke-width: 3.5; }
@@ -653,7 +685,7 @@
 /* stronger axis visuals so axis lines are always visible */
 .chart-axis-main { stroke-width: 4; }
 .chart-axis-arrow { stroke-width: 4; }
-.chart-gridline { stroke: rgba(255,255,255,0.06); stroke-width: 1; }
+.chart-gridline { stroke: var(--border); stroke-width: 1; }
 .chart-tick-label.long {
   font-size: 16px;           /* fallback for long words */
   letter-spacing: 0.01em;
@@ -663,11 +695,12 @@
 /* ============================= */
 
 .experiment-theory-box {
-  background: #050505;
-  border: 1px solid #222;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 32px;
   margin-bottom: 40px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Title */
@@ -676,13 +709,14 @@
   font-weight: 800;
   margin-bottom: 16px;
   text-align: center;
+  color: var(--text);
 }
 
 /* Body text */
 .theory-body {
   font-size: 1.25rem;
   line-height: 1.75;
-  color: #ddd;
+  color: var(--text-2);
 }
 
 /* Section headings */
@@ -691,7 +725,7 @@
   margin-bottom: 10px;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* Paragraph spacing */
@@ -703,17 +737,18 @@
 .theory-highlight {
   margin-top: 20px;
   padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 4px solid #ffffff;
+  background: var(--bg-canvas);
+  border-left: 4px solid var(--accent);
   border-radius: 6px;
   font-size: 0.9rem;
+  color: var(--text-2);
 }
 
 /* Footer note */
 .theory-footer {
   margin-top: 24px;
   font-size: 1rem;
-  color: #aaa;
+  color: var(--text-3);
   text-align: center;
 }
 
@@ -722,8 +757,8 @@
 /* ============================= */
 
 .bb84-step {
-  background: #050505;
-  border: 1px solid #222;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 18px;
   margin-bottom: 14px;
@@ -735,7 +770,7 @@
   font-size: 1rem;
   cursor: pointer;
   list-style: none;
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* Remove default marker */
@@ -747,7 +782,7 @@
 .bb84-step p {
   margin-top: 10px;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--text-2);
 }
 
 /* Lists inside steps */
@@ -767,8 +802,8 @@
 .bb84-ready {
   margin-top: 30px;
   padding: 20px;
-  background: #0a0a0a;
-  border: 1px solid #333;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
   border-radius: 10px;
   text-align: center;
 }
@@ -777,11 +812,12 @@
   font-size: 1.2rem;
   font-weight: 800;
   margin-bottom: 6px;
+  color: var(--text);
 }
 
 .bb84-ready-sub {
   font-size: 0.9rem;
-  color: #bbb;
+  color: var(--text-3);
 }
 /* ============================= */
 /* LIMIT THEORY WIDTH (CENTERED) */
@@ -799,7 +835,7 @@
   font-size: 1.35rem;
   font-weight: 700;
   margin-bottom: 16px;
-  color: #ffffff;
+  color: var(--text);
 }
 /* ======================================================
    BB84 STEP-BY-STEP SECTION (SAFE & ISOLATED)
@@ -818,8 +854,8 @@ section.bb84-onboarding .bb84-step {
   width: 100%;
   margin-bottom: 18px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
 }
 
 /* Step title */
@@ -829,6 +865,7 @@ section.bb84-onboarding .bb84-step summary {
   font-weight: 700;
   cursor: pointer;
   list-style: none;
+  color: var(--text);
 }
 
 /* Remove default arrow */
@@ -841,6 +878,7 @@ section.bb84-onboarding .bb84-step p,
 section.bb84-onboarding .bb84-step ul {
   padding: 0 22px 14px 22px;
   line-height: 1.6;
+  color: var(--text-2);
 }
 
 /* Lists */
@@ -859,19 +897,20 @@ section.bb84-onboarding .bb84-ready {
   text-align: center;
   padding: 24px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
 }
 
 section.bb84-onboarding .bb84-ready-title {
   font-size: 1.3rem;
   font-weight: 800;
   margin-bottom: 6px;
+  color: var(--text);
 }
 
 section.bb84-onboarding .bb84-ready-sub {
   font-size: 1rem;
-  color: #ccc;
+  color: var(--text-3);
 }
 /* =====================================================
    FORCE BB84 STEPS TO STACK VERTICALLY (FIX COLUMN BUG)
@@ -916,7 +955,7 @@ section.bb84-onboarding {
 
 /* Sub-head emphasis inside steps */
 .bb84-step p strong {
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* “Does NOT mean” + “It means” blocks */
@@ -927,18 +966,18 @@ section.bb84-onboarding {
 
 .bb84-step ul li {
   margin-bottom: 8px;
-  color: #d1d5db;
+  color: var(--text-2);
   line-height: 1.6;
 }
 
 /* Highlight warning list */
 .bb84-step ul:first-of-type li {
-  color: #ffffff 
+  color: var(--text-2);
 }
 
 /* Explanation text */
 .bb84-step p {
-  color: #d1d5db;
+  color: var(--text-2);
   line-height: 1.7;
   margin-bottom: 14px;
 }
@@ -948,7 +987,8 @@ section.bb84-onboarding {
   max-width: 365px;
   margin: 20px auto;
   border-collapse: collapse;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   font-size: 0.95rem;
@@ -956,7 +996,7 @@ section.bb84-onboarding {
 
 
 .bb84-eve-table thead {
-  background: rgba(255,255,255,0.08);
+  background: var(--border);
 }
 
 .bb84-eve-table th,
@@ -967,16 +1007,16 @@ section.bb84-onboarding {
 
 
 .bb84-eve-table th {
-  color: #ffffff;
+  color: var(--text);
   font-weight: 700;
 }
 
 .bb84-eve-table td {
-  color: #e5e7eb;
+  color: var(--text-2);
 }
 
 .bb84-eve-table tbody tr:not(:last-child) {
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid var(--border);
 }
 /* ===== Instructions Modal ===== */
 
@@ -1000,11 +1040,12 @@ section.bb84-onboarding {
 .instructions-modal {
   max-width: 700px;
   width: 90%;
-  background: #0b0b0b;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 28px;
-  color: #fff;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Title */
@@ -1020,7 +1061,7 @@ section.bb84-onboarding {
   padding-left: 20px;
   line-height: 1.7;
   font-size: 15px;
-  color: #ddd;
+  color: var(--text-2);
 }
 
 .instructions-list li {
@@ -1048,13 +1089,13 @@ section.bb84-onboarding {
 /* Hover = lift slightly */
 .exp-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 /* Click / Active = pressed */
 .exp-btn:active {
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-sm);
 }
 /* ===== Compact Vertical Graph Explanation ===== */
 
@@ -1063,10 +1104,11 @@ section.bb84-onboarding {
   margin: 1px auto 8px;
   padding: 2px 12px;
 
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
   border-radius: 6px;
 
-  color: #e5e7eb;
+  color: var(--text-2);
   font-size: 0.9rem;
 }
 
@@ -1092,18 +1134,20 @@ section.bb84-onboarding {
 .graph-key {
   margin-top: 6px;
   font-size: 0.88rem;
-  color: #6ee7b7;
+  color: var(--accent);
 }
 
 /* === Apply Settings button hover (Exp 3 style) === */
 .controls-left-column .exp-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 14px var(--accent-glow);
+  background-color: var(--accent-2) !important;
+  border-color: var(--accent-2) !important;
 }
 
 /* === Reset / Ghost button hover (Exp 3 style) === */
 .controls-left-column .exp-btn-ghost:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--accent-glow);
 }
 /* ===== REPORT BUTTON STYLING ===== */
 .report-btn-large {
@@ -1115,11 +1159,19 @@ section.bb84-onboarding {
 }
 /* ===== REPORT BUTTON TEXT REFINEMENT ===== */
 .report-btn-large {
-  font-family: "Georgia", "Times New Roman", serif; /* academic feel */
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;   /* cleaner spacing */
   font-size: 17px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: 1px solid var(--accent) !important;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.report-btn-large:hover {
+  background: var(--accent-2) !important;
+  border-color: var(--accent-2) !important;
+  transform: translateY(-2px);
 }
 /* === FORCE DESKTOP LAYOUT + HORIZONTAL SCROLL === */
 .horizontal-scroll-wrapper {
@@ -1205,7 +1257,7 @@ html, body {
 
 /* 5. Hard Border & Spacing for Channel */
 .quantum-channel-section {
-  border: 1px solid rgba(255,255,255,0.7) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 16px !important;
   padding: 26px !important;
   width: 1050px !important;
@@ -1214,4 +1266,290 @@ html, body {
 .lab-container {
   padding-top: 0 !important;
 }
+
+/* ===================================================================
+   LIGHT THEME OVERRIDES
+   =================================================================== */
+.light-theme .lab-header.hero {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(6px);
+}
+.light-theme .lab-header.hero h1 {
+  text-shadow: none;
+  color: var(--text);
+}
+.light-theme .controls-left-column {
+  background: var(--bg-card);
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm);
+}
+.light-theme .controls-left-column h3 {
+  color: var(--text);
+}
+.light-theme .control-row {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+}
+.light-theme .control-row label {
+  color: var(--text-2);
+}
+.light-theme .slider-value {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.light-theme .exp-slider {
+  background: var(--border);
+}
+.light-theme .exp-slider::-webkit-slider-thumb {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.light-theme .exp-btn {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.light-theme .exp-btn-primary,
+.light-theme .channel-actions .exp-btn {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--accent) !important;
+}
+.light-theme .exp-btn-primary:hover,
+.light-theme .channel-actions .exp-btn:hover {
+  background: #1e40af !important;
+  box-shadow: var(--shadow-md);
+}
+.light-theme .exp-btn-ghost {
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent) !important;
+}
+.light-theme .exp-btn-ghost:hover {
+  background: rgba(29, 78, 216, 0.05) !important;
+}
+.light-theme #transmission-status,
+.light-theme #quantum-channel-status,
+.light-theme #transmission-status * {
+  background: var(--bg-canvas) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+.light-theme .channel-hero {
+  background: var(--bg-card);
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm);
+}
+.light-theme .channel-title-pill {
+  background: var(--bg-canvas);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.light-theme .channel-stage .polarizer-label,
+.light-theme .channel-stage .polarizer .label,
+.light-theme .channel-stage .polarizer-wrapper .label,
+.light-theme .channel-stage .polarizer-box .label,
+.light-theme .channel-stage .alice-polarizer-label,
+.light-theme .channel-stage .bob-polarizer-label,
+.light-theme .channel-stage .alice-label,
+.light-theme .channel-stage .bob-label {
+  color: var(--text-2);
+}
+.light-theme .table-responsive {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.light-theme .table-responsive::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+.light-theme .table-responsive::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
+}
+.light-theme .data-table {
+  color: var(--text);
+}
+.light-theme .data-table thead {
+  background: var(--bg-canvas);
+}
+.light-theme .data-table th {
+  color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+}
+.light-theme .data-table td {
+  color: var(--text);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.light-theme .data-table tbody tr:hover {
+  background: var(--bg-canvas);
+}
+.light-theme .photon-angle {
+  background: var(--bg-canvas);
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+}
+.light-theme .photon-angle[style],
+.light-theme .photon[style] .photon-angle[style] {
+  background: var(--bg-canvas) !important;
+  color: var(--text) !important;
+}
+.light-theme .slider-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+}
+.light-theme .graph-card,
+.light-theme .two-bar-card,
+.light-theme .chart-card {
+  border: 1px solid var(--border) !important;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+.light-theme .graph-label,
+.light-theme .two-bar-label,
+.light-theme .chart-title,
+.light-theme .chart-title-outside {
+  color: var(--text);
+}
+.light-theme .two-bar-bg {
+  fill: var(--bg-canvas);
+  stroke: var(--border);
+}
+.light-theme .two-bar-fill,
+.light-theme .chart-bar {
+  fill: var(--accent) !important;
+}
+.light-theme .two-bar-xlabel,
+.light-theme .chart-tick-label {
+  fill: var(--text-2);
+}
+.light-theme .graph-card .qber-box {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+}
+.light-theme .chart-axis-main,
+.light-theme .chart-axis-arrow {
+  stroke: var(--text-2);
+}
+.light-theme .chart-gridline {
+  stroke: var(--border);
+}
+.light-theme .chart-axis-label {
+  fill: var(--text);
+}
+.light-theme .chart-x-rotated {
+  fill: var(--text-2);
+}
+.light-theme .experiment-theory-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.light-theme .experiment-theory-box .theory-title {
+  color: var(--text);
+}
+.light-theme .theory-body {
+  color: var(--text-2);
+}
+.light-theme .theory-body h4 {
+  color: var(--text);
+}
+.light-theme .theory-highlight {
+  background: var(--bg-canvas);
+  border-left: 4px solid var(--accent);
+  color: var(--text-2);
+}
+.light-theme .theory-footer {
+  color: var(--text-3);
+}
+.light-theme .bb84-step {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+.light-theme .bb84-step summary {
+  color: var(--text);
+}
+.light-theme .bb84-step p,
+.light-theme .bb84-step ul li {
+  color: var(--text-2);
+}
+.light-theme .bb84-ready {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+}
+.light-theme .bb84-ready-title {
+  color: var(--text);
+}
+.light-theme .bb84-ready-sub {
+  color: var(--text-3);
+}
+.light-theme .experiment-theory-box .theory-body > strong {
+  color: var(--text);
+}
+.light-theme section.bb84-onboarding .bb84-step {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+.light-theme section.bb84-onboarding .bb84-step summary {
+  color: var(--text);
+}
+.light-theme section.bb84-onboarding .bb84-step p,
+.light-theme section.bb84-onboarding .bb84-step ul {
+  color: var(--text-2);
+}
+.light-theme section.bb84-onboarding .bb84-ready {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+}
+.light-theme section.bb84-onboarding .bb84-ready-title {
+  color: var(--text);
+}
+.light-theme section.bb84-onboarding .bb84-ready-sub {
+  color: var(--text-3);
+}
+.light-theme .bb84-step p strong {
+  color: var(--text);
+}
+.light-theme .bb84-eve-table {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+}
+.light-theme .bb84-eve-table thead {
+  background: var(--border);
+}
+.light-theme .bb84-eve-table th {
+  color: var(--text);
+}
+.light-theme .bb84-eve-table td {
+  color: var(--text-2);
+}
+.light-theme .bb84-eve-table tbody tr:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+.light-theme .instructions-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+.light-theme .instructions-modal h2 {
+  color: var(--text);
+}
+.light-theme .instructions-list {
+  color: var(--text-2);
+}
+.light-theme .graph-explanation-compact {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+}
+.light-theme .graph-key {
+  color: var(--accent);
+}
+
 
