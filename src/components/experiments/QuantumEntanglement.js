@@ -7,6 +7,7 @@ import Link from "next/link";
 import { LANG_META } from "../../data/translations";
 import { TRANSLATIONS_EXP_1_2 } from "../../data/translations_exp_1.2";
 import { COLAB_LINKS } from "../../data/colabLinks";
+import { CONSISTENT_NAV } from "../../data/consistentNav";
 
 const QUIZ_ANSWERS = [0, 1, 1, 2, 1, 1, 2, 3, 1, 2];
 
@@ -627,7 +628,7 @@ function Interactive3DBlochSphere({ x = 0, y = 0, z = 1, label = "|ψ⟩" }) {
 // -------------------------------------------------------------------
 // MAIN EXPORTS COMPONENT
 // -------------------------------------------------------------------
-export default function QuantumEntanglement({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { }, onQuizPassed = () => { } } = {}) {
+export default function QuantumEntanglement({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { }, onQuizPassed = () => { }, initialCompleted = false, userName = "Google Learner", userId = "" } = {}) {
   const dict = TRANSLATIONS_EXP_1_2[lang] || TRANSLATIONS_EXP_1_2.en;
 
   const topics = [
@@ -730,8 +731,32 @@ print("Measurement counts (Bell state Φ+):", counts)
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedOpt, setSelectedOpt] = useState(null);
   const [quizScore, setQuizScore] = useState(0);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizPassed, setQuizPassed] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState(() => {
+    if (initialCompleted) return true;
+    try {
+      return localStorage.getItem(`lab_completed_${userId}_1.2`) === "Completed";
+    } catch (e) {
+      return false;
+    }
+  });
+  const [quizPassed, setQuizPassed] = useState(() => {
+    if (initialCompleted) return true;
+    try {
+      return localStorage.getItem(`lab_completed_${userId}_1.2`) === "Completed";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (initialCompleted) {
+      setQuizPassed(true);
+      setQuizSubmitted(true);
+      try {
+        localStorage.setItem(`lab_completed_${userId}_1.2`, "Completed");
+      } catch (e) {}
+    }
+  }, [initialCompleted, userId]);
   const [timeLeft, setTimeLeft] = useState(30);
 
   const quizQuestions = dict.quiz_questions.map((q, idx) => ({
@@ -895,9 +920,12 @@ print("Measurement counts (Bell state Φ+):", counts)
     } else {
       setQuizSubmitted(true);
       const finalScore = quizScore;
-      const passed = finalScore === quizQuestions.length;
+      const passed = finalScore >= Math.ceil(quizQuestions.length * 0.7);
       setQuizPassed(passed);
       if (passed) {
+        try {
+          localStorage.setItem(`lab_completed_${userId}_1.2`, "Completed");
+        } catch (e) {}
         onQuizPassed();
       }
     }
@@ -1220,7 +1248,6 @@ ${circuitHtml}
     </ul>
   </li>
   <li>Report Date: <strong>${reportDate}</strong></li>
-  <li>Cryptographic Hash: <strong>WQL-12-BENT-A8B9C7D6</strong></li>
 </ul>
 
 <h3>6. Conclusion</h3>
@@ -1262,7 +1289,7 @@ ${circuitHtml}
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
     doc.setTextColor(17, 24, 39);
-    doc.text("Learner Name", 148, 90, { align: "center" });
+    doc.text(userName, 148, 90, { align: "center" });
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
@@ -1293,14 +1320,7 @@ ${circuitHtml}
     doc.setTextColor(55, 65, 81);
     doc.text(certDate, 30, 175);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(156, 163, 175);
-    doc.text("VERIFICATION HASH", 267, 168, { align: "right" });
-    doc.setFont("courier", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(139, 105, 20);
-    doc.text("WQL-12-BENT-A8B9C7D6", 267, 175, { align: "right" });
+    // Removed verification hash draw
 
     doc.save("Aether_Completion_Certificate_Exp_1.2.pdf");
   };
@@ -1326,30 +1346,28 @@ ${circuitHtml}
 
           <div className="builder-tab-nav">
             <button className={`builder-tab-btn ${view === "learn" ? "active" : ""}`} onClick={() => setView("learn")}>
-              {dict.nav_theory}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).theory}
             </button>
             <button className={`builder-tab-btn ${view === "builder" ? "active" : ""}`} onClick={() => setView("builder")}>
-              {dict.nav_playground}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).playground}
             </button>
             <button className={`builder-tab-btn ${view === "activity" ? "active" : ""}`} onClick={() => setView("activity")}>
-              {dict.nav_activities}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).activity}
             </button>
             <button
               className={`builder-tab-btn ${view === "sandbox" ? "active" : ""}`}
               onClick={() => setView("sandbox")}
             >
-              Qiskit Sandbox
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).sandbox}
             </button>
             <button className={`builder-tab-btn ${view === "quiz" ? "active" : ""}`} onClick={() => setView("quiz")}>
-              {dict.nav_quiz}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).quiz}
             </button>
             <button
               className={`builder-tab-btn ${view === "credentials" ? "active" : ""}`}
               onClick={() => setView("credentials")}
-              style={{ display: "flex", alignItems: "center", gap: 6 }}
             >
-              <Award size={13} />
-              {dict.btn_download_cert || "Credentials"}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).credentials}
             </button>
           </div>
 
@@ -2322,7 +2340,7 @@ ${circuitHtml}
 
                       <div style={{ textAlign: "center", marginBottom: 16 }}>
                         <p style={{ fontSize: "0.55rem", letterSpacing: "0.14em", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>This certifies that</p>
-                        <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>Learner Name</p>
+                        <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>{userName}</p>
                         <p style={{ fontSize: "0.58rem", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>has successfully completed</p>
                         <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "0.85rem", fontWeight: 600, color: "#1D4ED8", margin: 0 }}>
                           Bell State Entanglement • Exp 1.2
@@ -2342,10 +2360,6 @@ ${circuitHtml}
                         <div>
                           <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>COMPLETION DATE</p>
                           <p style={{ fontWeight: 600, color: "#374151", margin: 0 }}>{new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}</p>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>VERIFICATION HASH</p>
-                          <p style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#8B6914", margin: 0 }}>WQL-12-BELL-A3B4C5D6</p>
                         </div>
                       </div>
                     </div>
@@ -2545,7 +2559,7 @@ ${circuitHtml}
                         {dict.btn_download_report}
                       </button>
                       <button
-                        className="learn-cta-primary"
+                        className="btn-primary-wiser"
                         onClick={downloadCertificate}
                         style={{ width: "100%", padding: "10px 18px", fontSize: "0.85rem", fontWeight: 700 }}
                       >
@@ -2562,7 +2576,15 @@ ${circuitHtml}
                     <AlertCircle size={48} style={{ color: "#f43f5e", marginBottom: 16 }} />
                     <h4 style={{ fontWeight: 800, fontSize: "1.3rem", marginBottom: 12 }}>{dict.quiz_failed_title}</h4>
                     <p style={{ fontSize: "0.9rem", color: "var(--text-2)", marginBottom: 24, lineHeight: "1.6" }}>
-                      {dict.quiz_failed_desc.replace("{score}", quizScore.toString())}
+                      {(() => {
+                        let desc = (dict.quiz_failed_desc || "").replace("{score}", quizScore.toString());
+                        if (lang === 'en') {
+                          desc = desc.replace("A perfect 10/10 score is required to pass", "A score of 7/10 (70%) or higher is required to pass");
+                        } else {
+                          desc = desc.replace("10/10", "7/10");
+                        }
+                        return desc;
+                      })()}
                     </p>
                     <button
                       className="learn-cta-primary"

@@ -129,6 +129,46 @@ export default function ExperimentsHome() {
   };
 
   const dict = TRANSLATIONS[lang];
+
+  const getDifficultyTranslation = (difficulty: string) => {
+    const diffTranslations: Record<LangCode, Record<string, string>> = {
+      en: { Beginner: "Beginner", Intermediate: "Intermediate", Advanced: "Advanced" },
+      hi: { Beginner: "प्रारंभिक", Intermediate: "मध्यम", Advanced: "उन्नत" },
+      kn: { Beginner: "ಅನನುಭವಿ", Intermediate: "ಮಧ್ಯಮ", Advanced: "ಸುಧಾರಿತ" },
+      ta: { Beginner: "தொடக்கநிலை", Intermediate: "இடைநிலை", Advanced: "மேம்பட்ட" },
+      es: { Beginner: "Principiante", Intermediate: "Intermedio", Advanced: "Avanzado" },
+      fr: { Beginner: "Débutant", Intermediate: "Intermédiaire", Advanced: "Avancé" }
+    };
+    const langKey = diffTranslations[lang] ? lang : "en";
+    return diffTranslations[langKey][difficulty] || difficulty;
+  };
+
+  const getStatusTranslation = (status: string) => {
+    const statusTranslations: Record<LangCode, Record<string, string>> = {
+      en: { "Completed": "Completed", "In Progress": "In Progress", "Not Started": "Not Started", "Locked": "Locked" },
+      hi: { "Completed": "पूरा हुआ", "In Progress": "प्रगति पर है", "Not Started": "शुरू नहीं हुआ", "Locked": "लॉक है" },
+      kn: { "Completed": "ಪೂರ್ಣಗೊಂಡಿದೆ", "In Progress": "ಪ್ರಗತಿಯಲ್ಲಿದೆ", "Not Started": "ಪ್ರಾರಂಭಿಸಲಾಗಿಲ್ಲ", "Locked": "ಲಾಕ್ ಆಗಿದೆ" },
+      ta: { "Completed": "முடிந்தது", "In Progress": "செயல்பாட்டில் உள்ளது", "Not Started": "தொடங்கப்படவில்லை", "Locked": "பூட்டப்பட்டுள்ளது" },
+      es: { "Completed": "Completado", "In Progress": "En progreso", "Not Started": "No iniciado", "Locked": "Bloqueado" },
+      fr: { "Completed": "Terminé", "In Progress": "En cours", "Not Started": "Non démarré", "Locked": "Verrouillé" }
+    };
+    const langKey = statusTranslations[lang] ? lang : "en";
+    return statusTranslations[langKey][status] || status;
+  };
+
+  const getDurationTranslation = (duration: string) => {
+    const minsMap: Record<LangCode, string> = {
+      en: "mins",
+      hi: "मिनट",
+      kn: "ನಿಮಿಷಗಳು",
+      ta: "நிமிடங்கள்",
+      es: "min",
+      fr: "min"
+    };
+    const suffix = minsMap[lang] || "mins";
+    return duration.replace("mins", suffix);
+  };
+
   const experiments = EXPERIMENTS_DATA(dict).map(exp => ({
     ...exp,
     status: enforceProgressRules(statuses)[exp.id] || exp.status
@@ -283,7 +323,7 @@ export default function ExperimentsHome() {
               onMouseEnter={e => e.currentTarget.style.opacity = "0.8"}
               onMouseLeave={e => e.currentTarget.style.opacity = "1"}
             >
-              Sign Out
+              {dict.dash_sign_out}
             </button>
           </div>
         )}
@@ -292,7 +332,7 @@ export default function ExperimentsHome() {
           <li>
             <Link href="/" className="sidebar-nav-item">
               <Home size={18} />
-              <span>Landing Page</span>
+              <span>{dict.dash_landing_page}</span>
             </Link>
           </li>
           <li>
@@ -302,7 +342,7 @@ export default function ExperimentsHome() {
               style={{ border: "none", background: "none" }}
             >
               <Compass size={18} />
-              <span>All Tracks</span>
+              <span>{dict.dash_all_tracks}</span>
             </button>
           </li>
           <div style={{ height: 1, background: "var(--border)", margin: "12px 0" }} />
@@ -325,7 +365,7 @@ export default function ExperimentsHome() {
         {/* Progress & Sidebar Controls */}
         <div className="sidebar-progress-box mt-4">
           <div className="d-flex justify-content-between align-items-center mb-2">
-            <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-3)" }}>Progress</span>
+            <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-3)" }}>{dict.dash_progress}</span>
             <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--accent)" }}>
               {completedCount}/{experiments.length}
             </span>
@@ -341,7 +381,7 @@ export default function ExperimentsHome() {
             />
           </div>
           <p style={{ fontSize: "0.68rem", color: "var(--text-3)", marginTop: 8, margin: 0 }}>
-            {progressPercent}% Complete
+            {progressPercent}% {dict.dash_complete}
           </p>
         </div>
 
@@ -349,7 +389,7 @@ export default function ExperimentsHome() {
         <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
           {/* Theme Toggler */}
           <div className="d-flex align-items-center justify-content-between">
-            <span style={{ fontSize: "0.75rem", color: "var(--text-3)" }}>Theme</span>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-3)" }}>{dict.dash_theme}</span>
             <button
               className="theme-toggle"
               onClick={() => setDark(!dark)}
@@ -375,7 +415,7 @@ export default function ExperimentsHome() {
 
           {/* Lang Selector */}
           <div className="d-flex align-items-center justify-content-between">
-            <span style={{ fontSize: "0.75rem", color: "var(--text-3)" }}>Language</span>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-3)" }}>{dict.dash_language}</span>
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value as LangCode)}
@@ -405,10 +445,10 @@ export default function ExperimentsHome() {
         <header className="dashboard-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
           <div>
             <span style={{ fontSize: "0.75rem", color: "var(--accent)", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-              Virtual Workspace
+              {dict.dash_virtual_workspace}
             </span>
             <h2 className="font-display" style={{ fontSize: "1.8rem", fontWeight: 700, color: "var(--text)", marginTop: 4 }}>
-              Interactive Experiments
+              {dict.dash_interactive_experiments}
             </h2>
           </div>
 
@@ -416,7 +456,7 @@ export default function ExperimentsHome() {
             <Search size={16} className="text-muted" />
             <input
               type="text"
-              placeholder="Search experiments or concepts..."
+              placeholder={dict.dash_search_placeholder}
               className="dashboard-search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -466,7 +506,7 @@ export default function ExperimentsHome() {
                         color: t.color
                       }}
                     >
-                      Explore Track
+                      {dict.dash_explore_track}
                     </Link>
                   </motion.div>
                 </div>
@@ -522,7 +562,7 @@ export default function ExperimentsHome() {
                               ) : (
                                 <Lock size={10} className="me-1" />
                               )}
-                              {exp.status}
+                              {getStatusTranslation(exp.status)}
                             </span>
                           </div>
 
@@ -535,11 +575,11 @@ export default function ExperimentsHome() {
                           <div className="d-flex gap-3 mb-4" style={{ fontSize: "0.75rem", color: "var(--text-3)" }}>
                             <div className="d-flex align-items-center gap-1">
                               <BarChart size={13} />
-                              <span>{exp.difficulty}</span>
+                              <span>{getDifficultyTranslation(exp.difficulty)}</span>
                             </div>
                             <div className="d-flex align-items-center gap-1">
                               <Clock size={13} />
-                              <span>{exp.duration}</span>
+                              <span>{getDurationTranslation(exp.duration)}</span>
                             </div>
                           </div>
 
@@ -570,7 +610,7 @@ export default function ExperimentsHome() {
                                 disabled
                               >
                                 <Lock size={14} />
-                                <span>Locked</span>
+                                <span>{dict.dash_locked}</span>
                               </button>
                             ) : (
                               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -580,11 +620,11 @@ export default function ExperimentsHome() {
                                   style={{ textDecoration: "none", fontSize: "0.82rem" }}
                                 >
                                   {isCompleted ? (
-                                    <span>Restart Lab</span>
+                                    <span>{dict.dash_restart_lab}</span>
                                   ) : isNotStarted ? (
-                                    <span>Start Lab</span>
+                                    <span>{dict.dash_start_lab}</span>
                                   ) : (
-                                    <span>Resume Lab</span>
+                                    <span>{dict.dash_resume_lab}</span>
                                   )}
                                   <ArrowRight size={14} />
                                 </Link>

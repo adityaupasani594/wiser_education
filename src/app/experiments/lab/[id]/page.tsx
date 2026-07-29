@@ -41,6 +41,7 @@ import "@/components/experiments/Experiment42.css";
 import { TRANSLATIONS_EXP_3_1 } from "@/data/translations_exp_3.1";
 import { TRANSLATIONS_EXP_3_2 } from "@/data/translations_exp_3.2";
 import { COLAB_LINKS } from "@/data/colabLinks";
+import { CONSISTENT_NAV } from "@/data/consistentNav";
 
 
 // ---------------------------------------------
@@ -1273,7 +1274,7 @@ const b92Topics = [
       "Measuring non-orthogonal states causes Eve to retransmit corrupted states, raising the QBER.",
       "If the conclusive rate drops or QBER exceeds 11%, the communication is aborted."
     ],
-    description: "In B92, Eve faces a harder challenge — the two states are non-orthogonal, so any measurement attempt has a non-zero probability of misidentifying the state. This introduces errors into the conclusive click events that Bob and Alice detect as elevated QBER. The standard abort threshold is 11% QBER."
+    description: "In B92, Eve faces a harder challenge — the two states are non-orthogonal, so any measurement attempt has a non-zero probability of misidentifying the state. This introduces errors into the conclusive click events that Bob and Alice detect."
   }
 ];
 
@@ -1282,11 +1283,131 @@ export default function LabWorkspacePage() {
   const idStr = params.id as string; // "2.1", "2.2", "3.1", or "3.2"
   const { user, loading: authLoading } = useAuth();
 
+  const getQuizTranslation = (key: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      en: {
+        title: "Checkpoint Quiz",
+        timeLeft: "Left",
+        next: "Next Question",
+        submit: "Submit Results",
+        successHeader: "Validation Complete!",
+        successDesc: `You scored ${quizScore}/10. Excellent! You have successfully unlocked the formal laboratory report and completion certificate.`,
+        viewCreds: "View Credentials",
+        retake: "Retry Checkpoint",
+        failHeader: "Verification Failed",
+        failDesc: `You scored ${quizScore}/10. A score of 7/10 (70%) or higher is required to pass. Please review the theory modules and try again.`,
+        lockedHeader: "Credentials Locked",
+        lockedDesc: "You must score 7/10 (70%) or higher on the Checkpoint Quiz to unlock the printable Laboratory Report and Completion Certificate.",
+        labReportTitle: "Academic Lab Report",
+        labReportDesc: "Complete the Visual Lab simulation to generate your measurements, then download a formal PDF report with circuit diagrams and Qiskit code.",
+        goToVisual: "Go to Visual Lab"
+      },
+      hi: {
+        title: "चेकपॉइंट क्विज़",
+        timeLeft: "शेष",
+        next: "अगला प्रश्न",
+        submit: "परिणाम सबमिट करें",
+        successHeader: "सत्यापन पूर्ण!",
+        successDesc: `आपने ${quizScore}/10 अंक प्राप्त किए। उत्कृष्ट! आपने प्रयोगशाला रिपोर्ट और पूर्णता प्रमाणपत्र को सफलतापूर्वक अनलॉक कर लिया है।`,
+        viewCreds: "क्रेडेंशियल देखें",
+        retake: "चेकपॉइंट पुनः प्रयास करें",
+        failHeader: "सत्यापन विफल",
+        failDesc: `आपने ${quizScore}/10 अंक प्राप्त किए। चेकपॉइंट पास करने के लिए 7/10 (70%) या उससे अधिक का स्कोर आवश्यक है। कृपया सिद्धांत मॉड्यूल की समीक्षा करें और पुनः प्रयास करें।`,
+        lockedHeader: "क्रेडेंशियल लॉक हैं",
+        lockedDesc: "प्रिंट करने योग्य प्रयोगशाला रिपोर्ट और पूर्णता प्रमाणपत्र को अनलॉक करने के लिए आपको चेकपॉइंट क्विज़ में 7/10 (70%) या उससे अधिक स्कोर करना होगा।",
+        labReportTitle: "अकादमिक लैब रिपोर्ट",
+        labReportDesc: "अपने माप उत्पन्न करने के लिए विज़ुअल लैब सिमुलेशन पूरा करें, फिर सर्किट आरेख और Qiskit कोड के साथ एक औपचारिक PDF रिपोर्ट डाउनलोड करें।",
+        goToVisual: "विज़ुअल लैब पर जाएं"
+      },
+      kn: {
+        title: "ಚೆಕ್‌ಪಾಯಿಂಟ್ ರಸಪ್ರಶ್ನೆ",
+        timeLeft: "ಉಳಿದಿದೆ",
+        next: "ಮುಂದಿನ ಪ್ರಶ್ನೆ",
+        submit: "ಫಲಿತಾಂಶಗಳನ್ನು ಸಲ್ಲಿಸಿ",
+        successHeader: "ಮೌಲ್ಯೀಕರಣ ಪೂರ್ಣಗೊಂಡಿದೆ!",
+        successDesc: `ನೀವು ${quizScore}/10 ಅಂಕಗಳನ್ನು ಗಳಿಸಿದ್ದೀರಿ. ಅದ್ಭುತ! ನೀವು ಪ್ರಯೋಗಾಲಯ ವರದಿ ಮತ್ತು ಪ್ರಮಾಣಪತ್ರವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿದ್ದೀರಿ.`,
+        viewCreds: "ರುಜುವಾತುಗಳನ್ನು ವೀಕ್ಷಿಸಿ",
+        retake: "ಚೆಕ್‌ಪಾಯಿಂಟ್ ಮರುಪ್ರಯತ್ನಿಸಿ",
+        failHeader: "ಪರಿಶೀಲನೆ ವಿಫಲವಾಗಿದೆ",
+        failDesc: `ನೀವು ${quizScore}/10 ಅಂಕಗಳನ್ನು ಗಳಿಸಿದ್ದೀರಿ. ಉತ್ತೀರ್ಣರಾಗಲು 7/10 (70%) ಅಥವಾ ಅದಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಅಂಕಗಳ ಅಗತ್ಯವಿದೆ. ದಯವಿಟ್ಟು ಸಿದ್ಧಾಂತವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`,
+        lockedHeader: "ರುಜುವಾತುಗಳು ಲಾಕ್ ಆಗಿವೆ",
+        lockedDesc: "ಪ್ರಿಂಟ್ ಮಾಡಬಹುದಾದ ಪ್ರಯೋಗಾಲಯ ವರದಿ ಮತ್ತು ಪೂರ್ಣಗೊಳಿಸುವಿಕೆ ಪ್ರಮಾಣಪತ್ರವನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಲು ನೀವು ಚೆಕ್‌ಪಾಯಿಂಟ್ ರಸಪ್ರಶ್ನೆಯಲ್ಲಿ 7/10 (70%) ಅಥವಾ ಅದಕ್ಕಿಂತ ಹೆಚ್ಚು ಅಂಕ ಗಳಿಸಬೇಕು.",
+        labReportTitle: "ಶೈಕ್ಷಣಿಕ ಲ್ಯಾಬ್ ವರದಿ",
+        labReportDesc: "ನಿಮ್ಮ ಅಳತೆಗಳನ್ನು ರಚಿಸಲು ದೃಶ್ಯ ಲ್ಯಾಬ್ ಸಿಮ್ಯುಲೇಶನ್ ಅನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ, ನಂತರ ಸರ್ಕ್ಯೂಟ್ ರೇಖಾಚಿತ್ರಗಳು ಮತ್ತು Qiskit ಕೋಡ್‌ನೊಂದಿಗೆ ಔಪಚಾರಿಕ PDF ವರದಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.",
+        goToVisual: "ದೃಶ್ಯ ಲ್ಯಾಬ್‌ಗೆ ಹೋಗಿ"
+      },
+      ta: {
+        title: "சோதனைச் சாவடி வினாடி வினா",
+        timeLeft: "மீதமுள்ளது",
+        next: "அடுத்த கேள்வி",
+        submit: "முடிவுகளைச் சமர்ப்பிக்கவும்",
+        successHeader: "சரிபார்ப்பு முடிந்தது!",
+        successDesc: `நீங்கள் ${quizScore}/10 மதிப்பெண் பெற்றுள்ளீர்கள். அருமை! முறையான ஆய்வக அறிக்கை மற்றும் சான்றிதழை வெற்றிகரமாக அணுகியுள்ளீர்கள்.`,
+        viewCreds: "சான்றுகளைப் பார்க்கவும்",
+        retake: "வினாடி வினாவை மீண்டும் எடுக்கவும்",
+        failHeader: "சரிபார்ப்பு தோல்வியடைந்தது",
+        failDesc: `நீங்கள் ${quizScore}/10 மதிப்பெண் பெற்றுள்ளீர்கள். தேர்ச்சி பெற 7/10 (70%) அல்லது அதற்கு மேற்பட்ட மதிப்பெண்கள் தேவை. தயவுசெய்து கோட்பாடு தொகுதிகளை மதிப்பாய்வு செய்து மீண்டும் முயற்சிக்கவும்.`
+      },
+      es: {
+        title: "Cuestionario de Control",
+        timeLeft: "Restantes",
+        next: "Siguiente Pregunta",
+        submit: "Enviar Resultados",
+        successHeader: "¡Validación Completa!",
+        successDesc: `Obtuviste ${quizScore}/10 puntos. ¡Excelente! Has desbloqueado con éxito el informe de laboratorio y el certificado de finalización.`,
+        viewCreds: "Ver Credenciales",
+        retake: "Reintentar Punto de Control",
+        failHeader: "Verificación Fallida",
+        failDesc: `Obtuviste ${quizScore}/10 puntos. Se requiere una puntuación de 7/10 (70%) o superior para aprobar. Por favor, revise la teoría e inténtelo de nuevo.`
+      },
+      fr: {
+        title: "Quiz de Contrôle",
+        timeLeft: "Restant",
+        next: "Question Suivante",
+        submit: "Soumettre les Résultats",
+        successHeader: "Validation Réussie !",
+        successDesc: `Vous avez obtenu ${quizScore}/10 points. Excellent ! Vous avez débloqué avec succès le rapport de laboratoire et le certificat de complétion.`,
+        viewCreds: "Voir les Accréditations",
+        retake: "Réessayer le Checkpoint",
+        failHeader: "Échec de la Vérification",
+        failDesc: `Vous avez obtenu ${quizScore}/10 points. Un score de 7/10 (70%) ou plus est requis pour réussir. Veuillez revoir la théorie et réessayer.`
+      }
+    };
+    const langKey = translations[lang] ? lang : "en";
+    return translations[langKey][key] || translations.en[key] || "";
+  };
+
   const isTeleport = idStr === "2.1";
 
   const [dark, setDark] = useState(true);
   const [lang, setLang] = useState<LangCode>("en");
   const [labStatus, setLabStatus] = useState<"Loading" | "In Progress" | "Completed" | "Locked">("Loading");
+  const [profileName, setProfileName] = useState<string>("Google Learner");
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) return;
+
+    const uid = user.uid;
+    const displayName = user.displayName;
+
+    // Set initial fallback name
+    setProfileName(displayName || "Google Learner");
+
+    // Fetch from Firestore users collection
+    async function loadProfileName() {
+      try {
+        const userDocRef = doc(db, "users", uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists() && userDocSnap.data().name) {
+          setProfileName(userDocSnap.data().name);
+        }
+      } catch (err) {
+        console.error("Error loading user profile name:", err);
+      }
+    }
+    loadProfileName();
+  }, [user, authLoading]);
 
   // Fetch progress and check if current lab is unlocked/completed on mount
   useEffect(() => {
@@ -1296,6 +1417,17 @@ export default function LabWorkspacePage() {
         setLabStatus("Locked");
         return;
       }
+
+      // Fast fallback from localStorage cache
+      try {
+        const cached = localStorage.getItem(`lab_completed_${user.uid}_${idStr}`);
+        if (cached === "Completed") {
+          setLabStatus("Completed");
+          setQuizPassed(true);
+          setQuizSubmitted(true);
+        }
+      } catch (e) {}
+
       try {
         const progressDocRef = doc(db, "progress", user.uid);
         const progressDocSnap = await getDoc(progressDocRef);
@@ -1334,6 +1466,7 @@ export default function LabWorkspacePage() {
         setLabStatus(currentStatus as any);
         if (currentStatus === "Completed") {
           setQuizPassed(true);
+          setQuizSubmitted(true);
         }
       } catch (err) {
         console.error("Error loading lab status:", err);
@@ -1763,8 +1896,12 @@ export default function LabWorkspacePage() {
         experimentStatuses: statuses,
         updatedAt: new Date().toISOString()
       });
+      try {
+        localStorage.setItem(`lab_completed_${user.uid}_${labId}`, "Completed");
+      } catch (e) {}
       setLabStatus("Completed");
       setQuizPassed(true);
+      setQuizSubmitted(true);
     } catch (err) {
       console.error("Error saving lab completion:", err);
     }
@@ -1779,7 +1916,7 @@ export default function LabWorkspacePage() {
     } else {
       setQuizSubmitted(true);
       const finalScore = quizScore + (forced ? 0 : 0);
-      const passed = finalScore === questions.length;
+      const passed = finalScore >= Math.ceil(questions.length * 0.7);
       setQuizPassed(passed);
 
       if (passed) {
@@ -2051,8 +2188,7 @@ ${svgCircuit}
 
 <hr style="border: 0; border-top: 1px dashed black; margin-top: 50px;"/>
 <p style="text-align: center; font-size: 12px; color: #333;">
-  <strong>VERIFICATION HASH:</strong> WQL-${idStr.replace(".", "")}-A3F9D1B2-2026<br/>
-  Aether Quantum Laboratory Certification Board • Verified 10/10 Score<br/>
+  Aether Quantum Laboratory Certification Board • Verified Passing Score<br/>
   <strong>Experiment Date:</strong> ${reportDate}
 </p>
 
@@ -2092,7 +2228,7 @@ ${svgCircuit}
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
     doc.setTextColor(17, 24, 39);
-    doc.text("Learner Name", 148, 90, { align: "center" });
+    doc.text(profileName, 148, 90, { align: "center" });
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
@@ -2133,14 +2269,7 @@ ${svgCircuit}
     doc.setTextColor(55, 65, 81);
     doc.text("12 July 2026", 30, 175);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(156, 163, 175);
-    doc.text("VERIFICATION HASH", 267, 168, { align: "right" });
-    doc.setFont("courier", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(139, 105, 20);
-    doc.text(certHash, 267, 175, { align: "right" });
+    // Removed verification hash draw
 
     doc.save(`Aether_Completion_Certificate_Exp_${idStr}.pdf`);
   };
@@ -2232,19 +2361,19 @@ ${svgCircuit}
   }
 
   if (idStr === "1.1") {
-    return <QuantumBasics dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("1.1")} />;
+    return <QuantumBasics dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("1.1")} initialCompleted={labStatus === "Completed"} userName={profileName} userId={user?.uid || ""} />;
   }
 
   if (idStr === "1.2") {
-    return <QuantumEntanglement dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("1.2")} />;
+    return <QuantumEntanglement dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("1.2")} initialCompleted={labStatus === "Completed"} userName={profileName} userId={user?.uid || ""} />;
   }
 
   if (idStr === "4.1") {
-    return <Experiment41 dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
+    return <Experiment41 dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("4.1")} initialCompleted={labStatus === "Completed"} userName={profileName} userId={user?.uid || ""} />;
   }
 
   if (idStr === "4.2") {
-    return <Experiment42 dark={dark} setDark={setDark} lang={lang} setLang={setLang} />;
+    return <Experiment42 dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("4.2")} initialCompleted={labStatus === "Completed"} userName={profileName} userId={user?.uid || ""} />;
   }
 
   if (idStr === "3.1") {
@@ -2291,8 +2420,14 @@ ${svgCircuit}
               </div>
             </div>
             <div className="d-flex gap-2 overflow-x-auto pb-2" style={{ borderBottom: "1px solid var(--border)" }}>
-              {[{ id: "theory", label: "1. Theory ", icon: <BookOpen size={16} /> }, { id: "visual", label: "2. Visual Lab", icon: <Compass size={16} /> }, { id: "sandbox", label: "3. Qiskit Sandbox", icon: <Cpu size={16} /> }, { id: "quiz", label: "4. Checkpoint Quiz", icon: <HelpCircle size={16} /> }, { id: "report", label: "5. Report & Credentials", icon: <FileText size={16} /> }].map((tab) => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} style={{ padding: "10px 16px", background: activeTab === tab.id ? "var(--bg-card)" : "transparent", border: "1px solid", borderColor: activeTab === tab.id ? "var(--border)" : "transparent", borderBottomColor: activeTab === tab.id ? "var(--bg)" : "transparent", color: activeTab === tab.id ? "var(--accent)" : "var(--text-3)", borderRadius: "8px 8px 0 0", fontSize: "0.85rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", marginBottom: -1 }}>{tab.icon}{tab.label}</button>
+              {[
+                { id: "theory", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).theory },
+                { id: "visual", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).playground },
+                { id: "sandbox", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).sandbox },
+                { id: "quiz", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).quiz },
+                { id: "report", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).credentials }
+              ].map((tab) => (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} style={{ padding: "10px 16px", background: activeTab === tab.id ? "var(--bg-card)" : "transparent", border: "1px solid", borderColor: activeTab === tab.id ? "var(--border)" : "transparent", borderBottomColor: activeTab === tab.id ? "var(--bg)" : "transparent", color: activeTab === tab.id ? "var(--accent)" : "var(--text-3)", borderRadius: "8px 8px 0 0", fontSize: "0.85rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", marginBottom: -1 }}>{tab.label}</button>
               ))}
             </div>
           </header>
@@ -2663,7 +2798,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                           <AlertCircle size={48} className="text-danger mb-3" />
                           <h4 style={{ fontWeight: 700 }}>Verification Failed</h4>
                           <p style={{ fontSize: "0.9rem", color: "var(--text-3)", marginBottom: 24 }}>
-                            You scored {quizScore}/10. A perfect 10/10 score is required to pass. Please review the theory modules and try again.
+                            You scored {quizScore}/10. A score of 7/10 (70%) or higher is required to pass. Please review the theory modules and try again.
                           </p>
                           <button
                             className="btn-primary-wiser"
@@ -2734,7 +2869,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
 
                             <div style={{ textAlign: "center", marginBottom: 16 }}>
                               <p style={{ fontSize: "0.55rem", letterSpacing: "0.14em", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>This certifies that</p>
-                              <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>Learner Name</p>
+                              <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>{profileName}</p>
                               <p style={{ fontSize: "0.58rem", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>has successfully completed</p>
                               <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "0.85rem", fontWeight: 600, color: "#1D4ED8", margin: 0 }}>
                                 BB84 QKD Protocol • Exp 3.1
@@ -2754,10 +2889,6 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                               <div>
                                 <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>COMPLETION DATE</p>
                                 <p style={{ fontWeight: 600, color: "#374151", margin: 0 }}>12 July 2026</p>
-                              </div>
-                              <div style={{ textAlign: "right" }}>
-                                <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>VERIFICATION HASH</p>
-                                <p style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#8B6914", margin: 0 }}>WQL-31-BB84-A9B8C7D6</p>
                               </div>
                             </div>
                           </div>
@@ -2822,8 +2953,14 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
               </div>
             </div>
             <div className="d-flex gap-2 overflow-x-auto pb-2" style={{ borderBottom: "1px solid var(--border)" }}>
-              {[{ id: "theory", label: "1. Theory ", icon: <BookOpen size={16} /> }, { id: "visual", label: "2. Visual Lab", icon: <Compass size={16} /> }, { id: "sandbox", label: "3. Qiskit Sandbox", icon: <Cpu size={16} /> }, { id: "quiz", label: "4. Checkpoint Quiz", icon: <HelpCircle size={16} /> }, { id: "report", label: "5. Report & Credentials", icon: <FileText size={16} /> }].map((tab) => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} style={{ padding: "10px 16px", background: activeTab === tab.id ? "var(--bg-card)" : "transparent", border: "1px solid", borderColor: activeTab === tab.id ? "var(--border)" : "transparent", borderBottomColor: activeTab === tab.id ? "var(--bg)" : "transparent", color: activeTab === tab.id ? "var(--accent)" : "var(--text-3)", borderRadius: "8px 8px 0 0", fontSize: "0.85rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", marginBottom: -1 }}>{tab.icon}{tab.label}</button>
+              {[
+                { id: "theory", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).theory },
+                { id: "visual", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).playground },
+                { id: "sandbox", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).sandbox },
+                { id: "quiz", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).quiz },
+                { id: "report", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).credentials }
+              ].map((tab) => (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} style={{ padding: "10px 16px", background: activeTab === tab.id ? "var(--bg-card)" : "transparent", border: "1px solid", borderColor: activeTab === tab.id ? "var(--border)" : "transparent", borderBottomColor: activeTab === tab.id ? "var(--bg)" : "transparent", color: activeTab === tab.id ? "var(--accent)" : "var(--text-3)", borderRadius: "8px 8px 0 0", fontSize: "0.85rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", marginBottom: -1 }}>{tab.label}</button>
               ))}
             </div>
           </header>
@@ -3137,7 +3274,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                           <AlertCircle size={48} className="text-danger mb-3" />
                           <h4 style={{ fontWeight: 700 }}>Verification Failed</h4>
                           <p style={{ fontSize: "0.9rem", color: "var(--text-3)", marginBottom: 24 }}>
-                            You scored {quizScore}/10. A perfect 10/10 score is required to pass. Please review the theory modules and try again.
+                            You scored {quizScore}/10. A score of 7/10 (70%) or higher is required to pass. Please review the theory modules and try again.
                           </p>
                           <button
                             className="btn-primary-wiser"
@@ -3208,7 +3345,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
 
                             <div style={{ textAlign: "center", marginBottom: 16 }}>
                               <p style={{ fontSize: "0.55rem", letterSpacing: "0.14em", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>This certifies that</p>
-                              <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>Learner Name</p>
+                              <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>{profileName}</p>
                               <p style={{ fontSize: "0.58rem", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>has successfully completed</p>
                               <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "0.85rem", fontWeight: 600, color: "#1D4ED8", margin: 0 }}>
                                 B92 QKD Protocol • Exp 3.2
@@ -3228,10 +3365,6 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                               <div>
                                 <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>COMPLETION DATE</p>
                                 <p style={{ fontWeight: 600, color: "#374151", margin: 0 }}>12 July 2026</p>
-                              </div>
-                              <div style={{ textAlign: "right" }}>
-                                <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>VERIFICATION HASH</p>
-                                <p style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#8B6914", margin: 0 }}>WQL-32-B92P-C3D4E5F6</p>
                               </div>
                             </div>
                           </div>
@@ -3273,12 +3406,12 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
           {/* PERSISTENT SUB-NAV FOR MODES */}
           <div className="builder-tab-nav" style={{ display: "flex", gap: 8 }}>
             {[
-              { id: "theory", label: "1. Theory Dashboard" },
-              { id: "visual", label: "2. Visual Lab" },
-              { id: "activity", label: "3. Interactive Activity" },
-              { id: "sandbox", label: "4. Qiskit Sandbox" },
-              { id: "quiz", label: "5. Checkpoint Quiz" },
-              { id: "report", label: "6. Report & Credentials" }
+              { id: "theory", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).theory },
+              { id: "visual", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).playground },
+              { id: "activity", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).activity },
+              { id: "sandbox", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).sandbox },
+              { id: "quiz", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).quiz },
+              { id: "report", label: (CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).credentials }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -4132,11 +4265,11 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                 exit={{ opacity: 0, y: -10 }}
               >
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h3 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0 }}>Checkpoint Quiz ({quizIndex + 1}/10)</h3>
+                  <h3 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0 }}>{getQuizTranslation("title")} ({quizIndex + 1}/10)</h3>
                   {!quizSubmitted && (
                     <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.9rem", color: timeLeft <= 5 ? "#f43f5e" : "var(--text)" }}>
                       <AlertCircle size={16} />
-                      <span style={{ fontWeight: 700 }}>{timeLeft}s Left</span>
+                      <span style={{ fontWeight: 700 }}>{timeLeft}s {getQuizTranslation("timeLeft")}</span>
                     </div>
                   )}
                 </div>
@@ -4199,7 +4332,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                           onClick={() => handleNextQuestion(false)}
                           style={{ padding: "10px 24px", fontSize: "0.82rem" }}
                         >
-                          {quizIndex < questions.length - 1 ? "Next Question" : "Submit Results"}
+                          {quizIndex < questions.length - 1 ? getQuizTranslation("next") : getQuizTranslation("submit")}
                           <ArrowRight size={14} className="ms-2" />
                         </button>
                       </div>
@@ -4210,20 +4343,20 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                     {quizPassed ? (
                       <div style={{ maxWidth: 460, margin: "0 auto" }}>
                         <CheckCircle2 size={48} className="text-success mb-3" />
-                        <h4 style={{ fontWeight: 700 }}>Validation Complete!</h4>
+                        <h4 style={{ fontWeight: 700 }}>{getQuizTranslation("successHeader")}</h4>
                         <p style={{ fontSize: "0.9rem", color: "var(--text-3)", marginBottom: 24 }}>
-                          You scored {quizScore}/10. Excellent! You have successfully unlocked the formal laboratory report and cryptographically signed completion certificate.
+                          {getQuizTranslation("successDesc")}
                         </p>
                         <button className="btn-primary-wiser" onClick={() => setActiveTab("report")}>
-                          View Credentials
+                          {getQuizTranslation("viewCreds")}
                         </button>
                       </div>
                     ) : (
                       <div style={{ maxWidth: 460, margin: "0 auto" }}>
                         <AlertCircle size={48} className="text-danger mb-3" />
-                        <h4 style={{ fontWeight: 700 }}>Verification Failed</h4>
+                        <h4 style={{ fontWeight: 700 }}>{getQuizTranslation("failHeader")}</h4>
                         <p style={{ fontSize: "0.9rem", color: "var(--text-3)", marginBottom: 24 }}>
-                          You scored {quizScore}/10. A perfect 10/10 score is required to pass. Please review the theory modules and try again.
+                          {getQuizTranslation("failDesc")}
                         </p>
                         <button
                           className="btn-primary-wiser"
@@ -4235,7 +4368,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                             setTimeLeft(30);
                           }}
                         >
-                          Retry Checkpoint
+                          {getQuizTranslation("retake")}
                         </button>
                       </div>
                     )}
@@ -4288,7 +4421,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                           {/* Metadata grid */}
                           <div className="row g-2 mb-4" style={{ fontSize: "0.75rem" }}>
                             {[
-                              ["Student Name", "Learner Name"],
+                              ["Student Name", profileName],
                               ["Roll Number", "CS21B042"],
                               ["Experiment", `Exp ${idStr} - ${isTeleport ? "Teleportation" : "Dense Coding"}`],
                               ["Date", "12 Jul 2026"]
@@ -4352,7 +4485,7 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
 
                             <div style={{ textAlign: "center", marginBottom: 16 }}>
                               <p style={{ fontSize: "0.55rem", letterSpacing: "0.14em", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>This certifies that</p>
-                              <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>Learner Name</p>
+                              <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>{profileName}</p>
                               <p style={{ fontSize: "0.58rem", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>has successfully completed</p>
                               <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "0.85rem", fontWeight: 600, color: "#1D4ED8", margin: 0 }}>
                                 {isTeleport ? "Quantum Teleportation • Exp 2.1" : "Superdense Coding • Exp 2.2"}
@@ -4372,10 +4505,6 @@ print(f"Sifted key: {len(sifted_alice)} bits | QBER: {qber:.1f}% | {'SECURE' if 
                               <div>
                                 <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>COMPLETION DATE</p>
                                 <p style={{ fontWeight: 600, color: "#374151", margin: 0 }}>12 July 2026</p>
-                              </div>
-                              <div style={{ textAlign: "right" }}>
-                                <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>VERIFICATION HASH</p>
-                                <p style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#8B6914", margin: 0 }}>WQL-21-A3F9D1B2-2026</p>
                               </div>
                             </div>
                           </div>

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { LANG_META } from "../../data/translations";
 import { TRANSLATIONS_EXP_4_2 } from "../../data/translations_exp_4.2";
 import { COLAB_LINKS } from "../../data/colabLinks";
+import { CONSISTENT_NAV } from "../../data/consistentNav";
 
 const QUIZ_ANSWERS = [1, 1, 1, 0, 1, 0, 1, 2, 1, 0];
 
@@ -548,7 +549,7 @@ function PhaseFlipCircuit({ playgroundStep, errorQubit, syndromesMeasured, corre
 // -------------------------------------------------------------------
 // MAIN EXPORTS COMPONENT
 // -------------------------------------------------------------------
-export default function Experiment42({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { } } = {}) {
+export default function Experiment42({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { }, onQuizPassed = () => { }, initialCompleted = false, userName = "Google Learner", userId = "" } = {}) {
   const dict = TRANSLATIONS_EXP_4_2[lang] || TRANSLATIONS_EXP_4_2.en;
 
   const topics = [
@@ -664,8 +665,32 @@ print("Syndrome outcomes:", counts)
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedOpt, setSelectedOpt] = useState(null);
   const [quizScore, setQuizScore] = useState(0);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizPassed, setQuizPassed] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState(() => {
+    if (initialCompleted) return true;
+    try {
+      return localStorage.getItem(`lab_completed_${userId}_4.2`) === "Completed";
+    } catch (e) {
+      return false;
+    }
+  });
+  const [quizPassed, setQuizPassed] = useState(() => {
+    if (initialCompleted) return true;
+    try {
+      return localStorage.getItem(`lab_completed_${userId}_4.2`) === "Completed";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (initialCompleted) {
+      setQuizPassed(true);
+      setQuizSubmitted(true);
+      try {
+        localStorage.setItem(`lab_completed_${userId}_4.2`, "Completed");
+      } catch (e) {}
+    }
+  }, [initialCompleted, userId]);
   const [timeLeft, setTimeLeft] = useState(30);
 
   // Timer loop for the Quiz
@@ -697,7 +722,14 @@ print("Syndrome outcomes:", counts)
     } else {
       setQuizSubmitted(true);
       const finalScore = quizScore;
-      setQuizPassed(finalScore === quizQuestions.length);
+      const passed = finalScore >= Math.ceil(quizQuestions.length * 0.7);
+      setQuizPassed(passed);
+      if (passed) {
+        try {
+          localStorage.setItem(`lab_completed_${userId}_4.2`, "Completed");
+        } catch (e) {}
+        onQuizPassed();
+      }
     }
   };
 
@@ -910,7 +942,7 @@ print("Syndrome outcomes:", counts)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
     doc.setTextColor(17, 24, 39);
-    doc.text("Learner Name", 148, 90, { align: "center" });
+    doc.text(userName, 148, 90, { align: "center" });
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
@@ -940,14 +972,7 @@ print("Syndrome outcomes:", counts)
     doc.setTextColor(55, 65, 81);
     doc.text(certDate, 30, 175);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(156, 163, 175);
-    doc.text("VERIFICATION HASH", 267, 168, { align: "right" });
-    doc.setFont("courier", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(139, 105, 20);
-    doc.text("WQL-42-3QEC-B2C3D4E5", 267, 175, { align: "right" });
+    // Removed verification hash draw
 
     doc.save("Aether_Completion_Certificate_Exp_4.2.pdf");
   };
@@ -996,22 +1021,22 @@ print("Syndrome outcomes:", counts)
           {/* MODE SELECTOR TABS */}
           <div className="builder-tab-nav">
             <button className={`builder-tab-btn ${view === "learn" ? "active" : ""}`} onClick={() => setView("learn")}>
-              {dict.nav_theory}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).theory}
             </button>
             <button className={`builder-tab-btn ${view === "builder" ? "active" : ""}`} onClick={() => setView("builder")}>
-              {dict.nav_playground}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).playground}
             </button>
             <button
               className={`builder-tab-btn ${view === "sandbox" ? "active" : ""}`}
               onClick={() => setView("sandbox")}
             >
-              Qiskit Sandbox
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).sandbox}
             </button>
             <button className={`builder-tab-btn ${view === "quiz" ? "active" : ""}`} onClick={() => setView("quiz")}>
-              {dict.nav_quiz}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).quiz}
             </button>
             <button className={`builder-tab-btn ${view === "credentials" ? "active" : ""}`} onClick={() => setView("credentials")}>
-              4. Credentials
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).credentials}
             </button>
           </div>
 
@@ -1645,7 +1670,15 @@ print("Syndrome outcomes:", counts)
                     </div>
                     <h3 style={{ fontSize: "1.4rem", fontWeight: 800, marginBottom: 12 }}>{dict.quiz_failed_title}</h3>
                     <p style={{ fontSize: "0.9rem", color: "var(--text-3)", lineHeight: 1.6, maxWidth: 480, margin: "0 auto 24px" }}>
-                      {dict.quiz_failed_desc.replace("{score}", quizScore.toString())}
+                      {(() => {
+                        let desc = (dict.quiz_failed_desc || "").replace("{score}", quizScore.toString());
+                        if (lang === 'en') {
+                          desc = desc.replace("A perfect 10/10 score is required to pass", "A score of 7/10 (70%) or higher is required to pass");
+                        } else {
+                          desc = desc.replace("10/10", "7/10");
+                        }
+                        return desc;
+                      })()}
                     </p>
                     <button className="btn-primary-wiser" onClick={handleRestartQuiz} style={{ padding: "10px 24px" }}>
                       {dict.btn_retake_quiz}
@@ -1695,7 +1728,7 @@ print("Syndrome outcomes:", counts)
 
                     <div style={{ textAlign: "center", margin: "24px 0" }}>
                       <p style={{ fontSize: "0.75rem", color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 8px 0" }}>This certifies that</p>
-                      <h2 style={{ fontFamily: "serif", fontSize: "1.9rem", fontWeight: 700, color: "#111827", margin: "0 0 10px 0" }}>Learner Name</h2>
+                      <h2 style={{ fontFamily: "serif", fontSize: "1.9rem", fontWeight: 700, color: "#111827", margin: "0 0 10px 0" }}>{userName}</h2>
                       <p style={{ fontSize: "0.75rem", color: "#6B7280", margin: "0 0 8px 0" }}>has successfully completed</p>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#1D4ED8", margin: 0 }}>3-Qubit Phase-Flip QEC • Experiment 4.2</h4>
                     </div>
@@ -1714,10 +1747,6 @@ print("Syndrome outcomes:", counts)
                         <div>
                           <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>COMPLETION DATE</p>
                           <p style={{ fontWeight: 600, color: "#374151", margin: 0 }}>{new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}</p>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>VERIFICATION HASH</p>
-                          <p style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#8B6914", margin: 0 }}>WQL-42-3QEC-B2C3D4E5</p>
                         </div>
                       </div>
                     </div>

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { LANG_META } from "../../data/translations";
 import { TRANSLATIONS_EXP_4_1 } from "../../data/translations_exp_4.1";
 import { COLAB_LINKS } from "../../data/colabLinks";
+import { CONSISTENT_NAV } from "../../data/consistentNav";
 
 const QUIZ_ANSWERS = [1, 0, 1, 0, 1, 0, 1, 1, 1, 0];
 
@@ -561,7 +562,7 @@ function BitFlipCircuit({ playgroundStep, errorQubit, syndromesMeasured, correct
 // -------------------------------------------------------------------
 // MAIN EXPORTS COMPONENT
 // -------------------------------------------------------------------
-export default function Experiment41({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { } } = {}) {
+export default function Experiment41({ dark = true, setDark = (val) => { }, lang = "en", setLang = (val) => { }, onQuizPassed = () => { }, initialCompleted = false, userName = "Google Learner", userId = "" } = {}) {
   const dict = TRANSLATIONS_EXP_4_1[lang] || TRANSLATIONS_EXP_4_1.en;
 
   const topics = [
@@ -668,8 +669,32 @@ print("Syndrome outcomes:", counts)
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedOpt, setSelectedOpt] = useState(null);
   const [quizScore, setQuizScore] = useState(0);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizPassed, setQuizPassed] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState(() => {
+    if (initialCompleted) return true;
+    try {
+      return localStorage.getItem(`lab_completed_${userId}_4.1`) === "Completed";
+    } catch (e) {
+      return false;
+    }
+  });
+  const [quizPassed, setQuizPassed] = useState(() => {
+    if (initialCompleted) return true;
+    try {
+      return localStorage.getItem(`lab_completed_${userId}_4.1`) === "Completed";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (initialCompleted) {
+      setQuizPassed(true);
+      setQuizSubmitted(true);
+      try {
+        localStorage.setItem(`lab_completed_${userId}_4.1`, "Completed");
+      } catch (e) {}
+    }
+  }, [initialCompleted, userId]);
   const [timeLeft, setTimeLeft] = useState(30);
 
   // Timer loop for the Quiz
@@ -701,7 +726,14 @@ print("Syndrome outcomes:", counts)
     } else {
       setQuizSubmitted(true);
       const finalScore = quizScore;
-      setQuizPassed(finalScore === quizQuestions.length);
+      const passed = finalScore >= Math.ceil(quizQuestions.length * 0.7);
+      setQuizPassed(passed);
+      if (passed) {
+        try {
+          localStorage.setItem(`lab_completed_${userId}_4.1`, "Completed");
+        } catch (e) {}
+        onQuizPassed();
+      }
     }
   };
 
@@ -920,7 +952,7 @@ print("Syndrome outcomes:", counts)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
     doc.setTextColor(17, 24, 39);
-    doc.text("Learner Name", 148, 90, { align: "center" });
+    doc.text(userName, 148, 90, { align: "center" });
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
@@ -950,14 +982,7 @@ print("Syndrome outcomes:", counts)
     doc.setTextColor(55, 65, 81);
     doc.text(certDate, 30, 175);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(156, 163, 175);
-    doc.text("VERIFICATION HASH", 267, 168, { align: "right" });
-    doc.setFont("courier", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(139, 105, 20);
-    doc.text("WQL-41-3QEC-A1B2C3D4", 267, 175, { align: "right" });
+    // Removed verification hash draw
 
     doc.save("Aether_Completion_Certificate_Exp_4.1.pdf");
   };
@@ -1006,22 +1031,22 @@ print("Syndrome outcomes:", counts)
           {/* MODE SELECTOR TABS */}
           <div className="builder-tab-nav">
             <button className={`builder-tab-btn ${view === "learn" ? "active" : ""}`} onClick={() => setView("learn")}>
-              {dict.nav_theory}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).theory}
             </button>
              <button className={`builder-tab-btn ${view === "builder" ? "active" : ""}`} onClick={() => setView("builder")}>
-              {dict.nav_playground}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).playground}
             </button>
             <button
               className={`builder-tab-btn ${view === "sandbox" ? "active" : ""}`}
               onClick={() => setView("sandbox")}
             >
-              Qiskit Sandbox
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).sandbox}
             </button>
             <button className={`builder-tab-btn ${view === "quiz" ? "active" : ""}`} onClick={() => setView("quiz")}>
-              {dict.nav_quiz}
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).quiz}
             </button>
             <button className={`builder-tab-btn ${view === "credentials" ? "active" : ""}`} onClick={() => setView("credentials")}>
-              4. Credentials
+              {(CONSISTENT_NAV[lang] || CONSISTENT_NAV.en).credentials}
             </button>
           </div>
 
@@ -1747,7 +1772,7 @@ print("Syndrome outcomes:", counts)
                       <button className="btn-primary-wiser" onClick={downloadReport} style={{ width: "100%", padding: "10px 18px", fontSize: "0.85rem", fontWeight: 700 }}>
                         {dict.btn_download_report}
                       </button>
-                      <button className="learn-cta-primary" onClick={downloadCertificate} style={{ width: "100%", padding: "10px 18px", fontSize: "0.85rem", fontWeight: 700 }}>
+                      <button className="btn-primary-wiser" onClick={downloadCertificate} style={{ width: "100%", padding: "10px 18px", fontSize: "0.85rem", fontWeight: 700 }}>
                         {dict.btn_download_cert}
                       </button>
                     </div>
@@ -1760,7 +1785,15 @@ print("Syndrome outcomes:", counts)
                     <AlertCircle size={48} style={{ color: "#f43f5e", marginBottom: 16 }} />
                     <h4 style={{ fontWeight: 800, fontSize: "1.3rem", marginBottom: 12 }}>{dict.quiz_failed_title}</h4>
                     <p style={{ fontSize: "0.9rem", color: "var(--text-2)", marginBottom: 24, lineHeight: "1.6" }}>
-                      {dict.quiz_failed_desc.replace("{score}", quizScore.toString())}
+                      {(() => {
+                        let desc = (dict.quiz_failed_desc || "").replace("{score}", quizScore.toString());
+                        if (lang === 'en') {
+                          desc = desc.replace("A perfect 10/10 score is required to pass", "A score of 7/10 (70%) or higher is required to pass");
+                        } else {
+                          desc = desc.replace("10/10", "7/10");
+                        }
+                        return desc;
+                      })()}
                     </p>
                     <button className="learn-cta-primary" onClick={handleRestartQuiz}>
                       {dict.btn_retake_quiz}
@@ -1851,7 +1884,7 @@ print("Syndrome outcomes:", counts)
 
                       <div style={{ textAlign: "center", marginBottom: 16 }}>
                         <p style={{ fontSize: "0.55rem", letterSpacing: "0.14em", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>This certifies that</p>
-                        <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>Learner Name</p>
+                        <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 700, color: "#111827", margin: "0 0 6px 0" }}>{userName}</p>
                         <p style={{ fontSize: "0.58rem", color: "#6B7280", textTransform: "uppercase", marginBottom: 6 }}>has successfully completed</p>
                         <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "0.85rem", fontWeight: 600, color: "#1D4ED8", margin: 0 }}>
                           3-Qubit Bit-Flip QEC • Exp 4.1
@@ -1871,10 +1904,6 @@ print("Syndrome outcomes:", counts)
                         <div>
                           <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>COMPLETION DATE</p>
                           <p style={{ fontWeight: 600, color: "#374151", margin: 0 }}>{new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}</p>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <p style={{ fontSize: "0.55rem", color: "#6B7280", margin: "0 0 2px 0" }}>VERIFICATION HASH</p>
-                          <p style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#8B6914", margin: 0 }}>WQL-41-3QEC-A1B2C3D4</p>
                         </div>
                       </div>
                     </div>
