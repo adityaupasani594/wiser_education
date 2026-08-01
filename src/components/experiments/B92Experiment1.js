@@ -364,8 +364,15 @@ Experiment 1 successfully demonstrates ideal quantum key distribution using the 
             <line x1={margin.left} x2={margin.left} y1={margin.top} y2={margin.top + innerH} className="chart-axis-main" />
             <line x1={margin.left} x2={margin.left + innerW} y1={baselineY} y2={baselineY} className="chart-axis-main" />
 
-            <rect x={leftX} y={valueToY(leftValue)} width={barWidth} height={baselineY - valueToY(leftValue)} rx="8" fill="#fff" />
-            <rect x={rightX} y={valueToY(rightValue)} width={barWidth} height={baselineY - valueToY(rightValue)} rx="8" fill="#555" />
+            <rect x={leftX} y={valueToY(leftValue)} width={barWidth} height={baselineY - valueToY(leftValue)} rx="8" fill="#3b82f6" />
+            <rect x={rightX} y={valueToY(rightValue)} width={barWidth} height={baselineY - valueToY(rightValue)} rx="8" fill="#eab308" />
+
+            {leftValue > 0 && (
+              <text x={leftX + barWidth / 2} y={valueToY(leftValue) - 10} className="chart-bar-value" style={{ fontSize: 20, fill: "#3b82f6", fontWeight: 800 }} textAnchor="middle">{leftValue}</text>
+            )}
+            {rightValue > 0 && (
+              <text x={rightX + barWidth / 2} y={valueToY(rightValue) - 10} className="chart-bar-value" style={{ fontSize: 20, fill: "#eab308", fontWeight: 800 }} textAnchor="middle">{rightValue}</text>
+            )}
 
             <text x={leftX + barWidth / 2} y={baselineY + 30} className="chart-tick-label" style={{ fontSize: 20, fill: "#ddd", fontWeight: 800 }} textAnchor="middle">{leftLabel}</text>
             <text x={rightX + barWidth / 2} y={baselineY + 30} className="chart-tick-label" style={{ fontSize: 20, fill: "#ddd", fontWeight: 800 }} textAnchor="middle">{rightLabel}</text>

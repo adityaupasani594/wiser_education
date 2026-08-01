@@ -977,7 +977,7 @@ Understanding error sources is essential for real-world quantum security.
               width={barWidth}
               height={baselineY - valueToY(leftValue)}
               rx="8"
-              fill="#fff"
+              fill="#3b82f6"
             />
             <rect
               x={rightX}
@@ -985,10 +985,32 @@ Understanding error sources is essential for real-world quantum security.
               width={barWidth}
               height={baselineY - valueToY(rightValue)}
               rx="8"
-              fill="#fff"
+              fill="#eab308"
             />
 
             {/* Values above bars */}
+            {leftValue > 0 && (
+              <text
+                x={leftX + barWidth / 2}
+                y={valueToY(leftValue) - 10}
+                className="chart-bar-value"
+                style={{ fontSize: 20, fill: "#3b82f6", fontWeight: 800 }}
+                textAnchor="middle"
+              >
+                {leftValue}
+              </text>
+            )}
+            {rightValue > 0 && (
+              <text
+                x={rightX + barWidth / 2}
+                y={valueToY(rightValue) - 10}
+                className="chart-bar-value"
+                style={{ fontSize: 20, fill: "#eab308", fontWeight: 800 }}
+                textAnchor="middle"
+              >
+                {rightValue}
+              </text>
+            )}
             {/* X labels under bars — increased size, weight, and moved lower */}
             <text
               x={leftX + barWidth / 2}
