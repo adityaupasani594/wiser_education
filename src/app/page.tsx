@@ -7,7 +7,7 @@ import {
   Atom, Sun, Moon, ArrowRight, Zap, MousePointer2, Globe,
   ShieldCheck, BookOpen, FlaskConical, ClipboardCheck,
   FileText, Award, ChevronUp, ExternalLink,
-  Layers, Cpu, Radio, RotateCcw,
+  Layers, Cpu, Radio, RotateCcw, GraduationCap, Code, Users, Sparkles,
 } from "lucide-react";
 import TRANSLATIONS, { LangCode, LANG_META } from "@/data/translations";
 import Link from "next/link";
@@ -223,6 +223,11 @@ function Navbar({ dark, setDark, lang, setLang, dict }: NavbarProps) {
         <div className="d-flex align-items-center justify-content-between">
           {/* Brand */}
           <div className="d-flex align-items-center gap-3">
+            {/* VESIT Logo */}
+            <div style={{ background: "#ffffff", padding: "4px 10px", borderRadius: 8, display: "flex", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+              <img src="/vesit-logo.png" alt="VESIT Logo" style={{ height: 28, objectFit: "contain" }} />
+            </div>
+            <div style={{ width: 1, height: 24, background: "var(--border)" }} />
             <motion.div
               className="nav-logo-icon"
               whileHover={{ rotate: 15, scale: 1.08 }}
@@ -232,7 +237,7 @@ function Navbar({ dark, setDark, lang, setLang, dict }: NavbarProps) {
             </motion.div>
             <div>
               <div className="nav-brand-title">Aether</div>
-              <div className="nav-brand-sub">Quantum Lab</div>
+              <div className="nav-brand-sub">VESIT Quantum Lab</div>
             </div>
           </div>
 
@@ -241,7 +246,8 @@ function Navbar({ dark, setDark, lang, setLang, dict }: NavbarProps) {
             {[
               { label: dict.nav_curriculum, href: "#curriculum" },
               { label: dict.nav_workflow, href: "#lab-workflow" },
-              { label: dict.nav_credentials, href: "#credentials" }
+              { label: dict.nav_credentials, href: "#credentials" },
+              { label: "Team", href: "#team" }
             ].map((link) => (
               <a key={link.label} href={link.href}
                 style={{ fontSize: "0.82rem", fontWeight: 500, color: "var(--text-3)", textDecoration: "none", transition: "color 0.2s" }}
@@ -363,6 +369,18 @@ function HeroSection({ dict }: { dict: any }) {
           {/* Left: text */}
           <div className="col-lg-6">
             <SectionWrapper>
+              {/* Institution badge */}
+              <motion.div
+                variants={stagger(0)}
+                className="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 99, boxShadow: "var(--shadow-sm)" }}
+              >
+                <img src="/vesit-logo.png" alt="VESIT Logo" style={{ height: 18, objectFit: "contain", background: "#fff", padding: "1px 5px", borderRadius: 4 }} />
+                <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--text-2)" }}>
+                  VESIT (Autonomous) · WISER Education Challenge
+                </span>
+              </motion.div>
+
               <motion.h1
                 variants={stagger(0.05)}
                 className="font-display"
@@ -957,6 +975,145 @@ function AssetsSection({ dict }: { dict: any }) {
 }
 
 // ─────────────────────────────────────────────
+// SECTION 5.5 — CONTRIBUTORS & TEAM
+// ─────────────────────────────────────────────
+function ContributorsSection({ dict }: { dict: any }) {
+  const CONTRIBUTORS = [
+    {
+      name: "Dr. Ranjan Bala Jain",
+      role: "Faculty Mentor & Syllabus Architect",
+      avatarBg: "linear-gradient(135deg, #fbbf24, #d97706)",
+      color: "#fbbf24",
+      icon: <GraduationCap size={22} />,
+      contributions: [
+        "Syllabus & Pedagogical Framework Design",
+        "Comprehensive Quiz & Assessment Architecture"
+      ],
+      badge: "Faculty Mentor"
+    },
+    {
+      name: "Aditya Upasani",
+      role: "Full-Stack & Quantum Developer",
+      avatarBg: "linear-gradient(135deg, #06b6d4, #2563eb)",
+      color: "#06b6d4",
+      icon: <Code size={22} />,
+      contributions: [
+        "Landing Page Architecture & Interactive Design",
+        "Track 02: Quantum Entanglement & Teleportation",
+        "Track 04: Quantum Noise Channels & Error Mitigation"
+      ],
+      badge: "Core Developer"
+    },
+    {
+      name: "Shravani Kale",
+      role: "Quantum Protocol & Credentials Developer",
+      avatarBg: "linear-gradient(135deg, #a78bfa, #db2777)",
+      color: "#a78bfa",
+      icon: <Award size={22} />,
+      contributions: [
+        "Track 01: Qubit Foundations & Quantum Gates",
+        "Track 03: Quantum Cryptography & QKD (BB84 & B92)",
+        "Certificate Generation & PDF Lab Report Export System"
+      ],
+      badge: "Core Developer"
+    }
+  ];
+
+  return (
+    <section id="team" style={{ padding: "100px 0", background: "var(--bg-canvas)" }}>
+      <div className="container-xl">
+        <SectionWrapper>
+          <div className="text-center mb-5">
+            <motion.p variants={fadeUp} className="section-label mb-2">PROJECT TEAM</motion.p>
+            <motion.h2 variants={fadeUp} className="section-title">
+              Contributors & Mentors
+            </motion.h2>
+            <motion.p variants={stagger(0.1)} className="section-body mx-auto mt-3" style={{ maxWidth: 560 }}>
+              Engineered with dedication for the WISER Education Challenge under Vivekanand Education Society's Institute of Technology (Autonomous).
+            </motion.p>
+          </div>
+
+          <div className="row g-4 justify-content-center">
+            {CONTRIBUTORS.map((c, i) => (
+              <div key={c.name} className="col-lg-4 col-md-6">
+                <motion.div
+                  variants={stagger(i * 0.08)}
+                  className="h-100"
+                  whileHover={{ y: -6, transition: { type: "spring", stiffness: 350, damping: 22 } }}
+                  style={{
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 20,
+                    padding: "28px 24px",
+                    position: "relative",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    boxShadow: "var(--shadow-md)"
+                  }}
+                >
+                  {/* Top glowing bar */}
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: c.avatarBg }} />
+
+                  {/* Header info */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+                    <div
+                      style={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: 14,
+                        background: c.avatarBg,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        boxShadow: `0 4px 14px ${c.color}40`,
+                        flexShrink: 0
+                      }}
+                    >
+                      {c.icon}
+                    </div>
+                    <div>
+                      <span className="tag-pill mb-1" style={{ background: `${c.color}15`, color: c.color, border: `1px solid ${c.color}35`, fontSize: "0.6rem", fontWeight: 700 }}>
+                        {c.badge}
+                      </span>
+                      <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.25rem", fontWeight: 700, color: "var(--text)", margin: "2px 0 0 0" }}>
+                        {c.name}
+                      </h3>
+                      <p style={{ fontSize: "0.75rem", color: "var(--text-3)", margin: 0, fontWeight: 500 }}>
+                        {c.role}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{ height: 1, background: "var(--border)", marginBottom: 18 }} />
+
+                  {/* Contributions list */}
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: "0.65rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--text-3)", fontWeight: 700, marginBottom: 10 }}>
+                      Key Contributions
+                    </p>
+                    {c.contributions.map((item, idx) => (
+                      <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: c.color, marginTop: 6, flexShrink: 0 }} />
+                        <span style={{ fontSize: "0.82rem", color: "var(--text-2)", lineHeight: 1.5 }}>
+                          {item}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            ))}
+          </div>
+        </SectionWrapper>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────
 // SECTION 6 — CTA + FOOTER
 // ─────────────────────────────────────────────
 function CTAFooter({ dict }: { dict: any }) {
@@ -998,13 +1155,16 @@ function CTAFooter({ dict }: { dict: any }) {
           <div className="row align-items-center g-4 mb-4">
             <div className="col-md-4">
               <div className="d-flex align-items-center gap-3 mb-2">
-                <div className="nav-logo-icon" style={{ width: 30, height: 30, borderRadius: 8 }}>
+                <div style={{ background: "#ffffff", padding: "2px 6px", borderRadius: 6, display: "flex", alignItems: "center" }}>
+                  <img src="/vesit-logo.png" alt="VESIT Logo" style={{ height: 22, objectFit: "contain" }} />
+                </div>
+                <div className="nav-logo-icon" style={{ width: 28, height: 28, borderRadius: 8 }}>
                   <Atom size={14} color="#fff" strokeWidth={1.8} />
                 </div>
                 <span className="nav-brand-title" style={{ fontSize: "0.85rem" }}>Aether Quantum Lab</span>
               </div>
               <p style={{ fontSize: "0.78rem", color: "var(--text-3)", lineHeight: 1.6 }}>
-                Quantum Communication
+                VESIT (Autonomous) · Quantum Communication
               </p>
             </div>
             <div className="col-md-4 d-flex justify-content-md-center">
@@ -1014,7 +1174,7 @@ function CTAFooter({ dict }: { dict: any }) {
                 </p>
                 {[
                   { label: dict.footer_link_qiskit, href: "https://docs.quantum.ibm.com" },
-                  { label: dict.footer_link_github, href: "#" },
+                  { label: dict.footer_link_github, href: "https://github.com/adityaupasani594/wiser_education" },
                   { label: dict.footer_link_ibm, href: "https://quantum.ibm.com" },
                 ].map(l => (
                   <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer"
@@ -1102,6 +1262,7 @@ export default function LandingPage() {
         <CurriculumSection dict={dict} />
         <WorkflowSection dict={dict} />
         <AssetsSection dict={dict} />
+        <ContributorsSection dict={dict} />
         <CTAFooter dict={dict} />
       </main>
     </div>
