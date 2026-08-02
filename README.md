@@ -36,7 +36,7 @@ Through **real-time visual state simulators**, **interactive Bloch spheres**, **
 Every experiment guides learners through a structured 5-step interactive pipeline:
 1. **Theory & Mathematics**: MathJax-rendered LaTeX equations, state matrices, and physical principles.
 2. **Interactive Simulation**: Playground for manipulating qubit states, logic gates, and observing immediate outcome state vectors.
-3. **Real Qiskit Execution**: Seamless launch buttons handing off pre-configured Python notebooks directly to Google Colab for execution on IBM Q hardware/simulators.
+3. **Real Qiskit Execution**: Seamless launch buttons handing off pre-configured Python notebooks directly to Google Colab for execution of Qiskit Code.
 4. **Knowledge Verification**: Auto-graded conceptual & analytical quizzes with instant explanatory feedback.
 5. **Academic Credentialing**: One-click exportable university-formatted PDF Lab Reports and verifiable Certificates of Completion.
 
@@ -75,38 +75,15 @@ Every experiment guides learners through a structured 5-step interactive pipelin
 
 ---
 
-## 📁 Repository Structure
+## 👥 Team Members & Contributions
 
-```text
-quantum-comm-platform/
-├── src/
-│   ├── app/
-│   │   ├── experiments/           # Experiment laboratory & track pages
-│   │   │   ├── lab/               # Individual virtual lab runner pages
-│   │   │   └── page.tsx           # Experiments Dashboard page
-│   │   ├── login/                 # Firebase Auth sign-in / sign-up
-│   │   ├── AuthProvider.tsx       # Auth context provider
-│   │   ├── globals.css            # Core design system tokens & themes
-│   │   ├── layout.tsx             # Root layout & Metadata
-│   │   └── page.tsx               # Main Landing Page (WISER Challenge Showcase)
-│   ├── components/
-│   │   └── experiments/           # Interactive experiment components & simulators
-│   │       ├── Experiment1..10.js # Individual experiment interactive widgets
-│   │       ├── B92Experiment1..4.js# B92 QKD interactive simulators
-│   │       ├── KeyAnalysisPanel.js# QKD Key sifting & error rate modules
-│   │       └── QuantumBasics.js   # Bloch sphere & circuit visualizer components
-│   └── data/
-│       ├── translations.ts        # Multilingual i18n dictionary (EN, HI, regional)
-│       └── colabLinks.ts          # External Qiskit notebook mappings
-├── public/                        # Static assets & icons
-├── README.md                      # Project documentation
-├── package.json                   # Project dependencies & scripts
-└── next.config.ts                 # Next.js configuration
-```
+| Member Name | Role & Key Contributions |
+| :--- | :--- |
+| **Dr. Ranjan Bala Jain** | Syllabus Design & Quiz / Assessment Design |
+| **Aditya Upasani** | Landing Page Development, Track 02 (Entanglement & Teleportation) & Track 04 (Noise Channels & Error Mitigation) |
+| **Shravani Kale** | Track 01 (Qubit Basics & Gates) & Track 03 (Quantum Cryptography & QKD), Certificate Generation & PDF Lab Report Export System |
 
 ---
-
-## 🚀 Local Development Setup
 
 To run **Aether Quantum Lab** locally on your machine:
 
