@@ -784,7 +784,7 @@ function QuantumChannel({
 
                   <td>{r.bBasis}</td>
                   <td>{r.bMeas === null ? "—" : r.bMeas}</td>
-                  <td style={{ color: r.bMeas === null ? "#999" : (r.match ? "#ffffff" : "#ffffff"), fontWeight: 700 }}>
+                  <td style={{ color: r.bMeas === null ? "#999" : "#3b82f6", fontWeight: 700 }}>
                     {r.bMeas === null ? "—" : (r.match ? "Yes" : "No")}
                   </td>
                 </tr>

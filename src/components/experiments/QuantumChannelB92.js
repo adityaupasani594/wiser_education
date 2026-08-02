@@ -469,7 +469,7 @@ function QuantumChannelB92({
                     {/* Definitive Sifting Action */}
                     <td style={{
                       fontWeight: 700,
-                      color: isBlocked ? "rgba(255,255,255,0.4)" : "#fff"
+                      color: isBlocked ? "rgba(59, 130, 246, 0.6)" : "#3b82f6"
                     }}>
                       {isBlocked ? "Dropped (Trash)" : `Saved (Bit ${r.bMeas})`}
                     </td>
