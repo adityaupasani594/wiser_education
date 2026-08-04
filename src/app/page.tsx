@@ -244,6 +244,7 @@ function Navbar({ dark, setDark, lang, setLang, dict }: NavbarProps) {
           {/* Links */}
           <div className="d-none d-md-flex align-items-center gap-4">
             {[
+              { label: dict.nav_about, href: "#about-aether" },
               { label: dict.nav_curriculum, href: "#curriculum" },
               { label: dict.nav_workflow, href: "#lab-workflow" },
               { label: dict.nav_credentials, href: "#credentials" },
@@ -482,6 +483,322 @@ function HeroSection({ dict }: { dict: any }) {
             </motion.div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────
+// SECTION — ABOUT AETHER (ACRONYM & VISION)
+// ─────────────────────────────────────────────
+function AetherMeaningSection({ dict }: { dict: any }) {
+  const ACRONYM_ITEMS = [
+    {
+      letter: "A",
+      word: "Adaptive",
+      suffix: "",
+      color: "#06b6d4",
+      glow: "rgba(6, 182, 212, 0.18)",
+      bgGradient: "linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+      borderColor: "rgba(6, 182, 212, 0.35)",
+      icon: <Sparkles size={20} color="#06b6d4" />,
+      description: "Personalized learning pathways with dynamic multi-language feedback and self-paced progress tracking.",
+    },
+    {
+      letter: "E",
+      word: "Environment",
+      suffix: "for",
+      color: "#a78bfa",
+      glow: "rgba(167, 139, 250, 0.18)",
+      bgGradient: "linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(236, 72, 153, 0.08) 100%)",
+      borderColor: "rgba(167, 139, 250, 0.35)",
+      icon: <Layers size={20} color="#a78bfa" />,
+      description: "A web-native, zero-setup platform with live circuit simulation and interactive 3D Bloch sphere rendering.",
+    },
+    {
+      letter: "T",
+      word: "Teaching,",
+      suffix: "",
+      color: "#34d399",
+      glow: "rgba(52, 211, 153, 0.18)",
+      bgGradient: "linear-gradient(135deg, rgba(52, 211, 153, 0.15) 0%, rgba(20, 184, 166, 0.08) 100%)",
+      borderColor: "rgba(52, 211, 153, 0.35)",
+      icon: <GraduationCap size={20} color="#34d399" />,
+      description: "Structured curriculum progressing from qubit state fundamentals to production-grade quantum error correction.",
+    },
+    {
+      letter: "H",
+      word: "Hands-On",
+      suffix: "",
+      color: "#fbbf24",
+      glow: "rgba(251, 191, 36, 0.18)",
+      bgGradient: "linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(249, 115, 22, 0.08) 100%)",
+      borderColor: "rgba(251, 191, 36, 0.35)",
+      icon: <MousePointer2 size={20} color="#fbbf24" />,
+      description: "Interactive parameter-driven controls, real-time quantum state vector displays, and live measurement telemetry.",
+    },
+    {
+      letter: "E",
+      word: "Experimentation",
+      suffix: "&",
+      color: "#f43f5e",
+      glow: "rgba(244, 63, 94, 0.18)",
+      bgGradient: "linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(225, 29, 72, 0.08) 100%)",
+      borderColor: "rgba(244, 63, 94, 0.35)",
+      icon: <FlaskConical size={20} color="#f43f5e" />,
+      description: "Live Qiskit Python code synchronization, copy-ready snippets, and one-click Google Colab execution.",
+    },
+    {
+      letter: "R",
+      word: "Research",
+      suffix: "",
+      color: "#3b82f6",
+      glow: "rgba(59, 130, 246, 0.18)",
+      bgGradient: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.08) 100%)",
+      borderColor: "rgba(59, 130, 246, 0.35)",
+      icon: <BookOpen size={20} color="#3b82f6" />,
+      description: "Rigorous 10-question evaluation checkpoints, formal academic PDF report generation, and cryptographic credentials.",
+    },
+  ];
+
+  return (
+    <section id="about-aether" style={{ paddingTop: "90px", paddingBottom: "90px", position: "relative", overflow: "hidden" }}>
+      {/* Background glow effects */}
+      <div style={{
+        position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)",
+        width: 800, height: 450,
+        background: "radial-gradient(ellipse, rgba(6, 182, 212, 0.08) 0%, rgba(167, 139, 250, 0.05) 50%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+
+      <div className="container-xl" style={{ position: "relative", zIndex: 1 }}>
+        <SectionWrapper className="text-center mb-5">
+          {/* Badge */}
+          <motion.div
+            variants={stagger(0)}
+            className="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1"
+            style={{
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              borderRadius: 99,
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <Atom size={14} color="var(--accent)" />
+            <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--text-2)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              PLATFORM VISION & ACRONYM
+            </span>
+          </motion.div>
+
+          <motion.h2
+            variants={stagger(0.05)}
+            className="font-display mb-3"
+            style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 700, color: "var(--text)" }}
+          >
+            What is <span style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AETHER</span>?
+          </motion.h2>
+
+          {/* Tagline card */}
+          <motion.div
+            variants={stagger(0.1)}
+            className="d-inline-block mx-auto mt-2 mb-4 px-4 py-3"
+            style={{
+              background: "var(--bg-card-glass)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid var(--border)",
+              borderRadius: 16,
+              boxShadow: "var(--shadow-md), 0 0 20px rgba(6, 182, 212, 0.1)",
+              maxWidth: 680,
+            }}
+          >
+            <p style={{ fontSize: "1.15rem", fontWeight: 600, color: "var(--text)", margin: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+              <Zap size={18} color="var(--accent)" />
+              <span>A virtual Lab for Quantum Communication.</span>
+            </p>
+          </motion.div>
+        </SectionWrapper>
+
+        {/* Acronym Full Banner Card */}
+        <SectionWrapper className="mb-5">
+          <motion.div
+            variants={stagger(0.12)}
+            style={{
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              borderRadius: 24,
+              padding: "36px 32px",
+              boxShadow: "var(--shadow-lg)",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            {/* Top accent bar */}
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: 4,
+              background: "linear-gradient(90deg, #06b6d4, #a78bfa, #34d399, #fbbf24, #f43f5e, #3b82f6)",
+            }} />
+
+            <div className="row align-items-center g-4">
+              <div className="col-lg-5">
+                <div style={{ paddingRight: 16 }}>
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <span style={{ fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)" }}>
+                      FULL FORM DECODED
+                    </span>
+                  </div>
+                  <h3 className="font-display" style={{ fontSize: "2.2rem", fontWeight: 700, lineHeight: 1.2, color: "var(--text)", marginBottom: 12 }}>
+                    A.E.T.H.E.R.
+                  </h3>
+                  <p style={{ fontSize: "0.92rem", lineHeight: 1.65, color: "var(--text-3)", marginBottom: 24 }}>
+                    An interactive, state-of-the-art virtual engineering platform designed for learning quantum communication protocols through hands-on visual simulation and live code.
+                  </p>
+
+                  <div className="d-flex align-items-center gap-3 p-3" style={{ background: "var(--bg-canvas)", borderRadius: 14, border: "1px solid var(--border)" }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(6, 182, 212, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <FlaskConical size={20} color="#06b6d4" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)" }}>
+                        Virtual Lab for Quantum Communication
+                      </div>
+                      <div style={{ fontSize: "0.74rem", color: "var(--text-3)" }}>
+                        VESIT Autonomous Quantum Platform
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-7">
+                {/* Spelled-out breakdown list with big highlight letters */}
+                <div className="d-flex flex-column gap-2" style={{ background: "var(--bg-canvas)", borderRadius: 18, padding: 20, border: "1px solid var(--border)" }}>
+                  {ACRONYM_ITEMS.map((item, idx) => (
+                    <motion.div
+                      key={item.letter + idx}
+                      whileHover={{ x: 6, backgroundColor: "var(--bg-card)" }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 16,
+                        padding: "10px 16px",
+                        borderRadius: 12,
+                        transition: "background-color 0.2s, transform 0.2s",
+                      }}
+                    >
+                      {/* Letter badge */}
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 10,
+                          background: item.glow,
+                          border: `1px solid ${item.borderColor}`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "1.3rem",
+                          fontWeight: 800,
+                          color: item.color,
+                          fontFamily: "JetBrains Mono, monospace",
+                          flexShrink: 0,
+                          boxShadow: `0 0 12px ${item.glow}`,
+                        }}
+                      >
+                        {item.letter}
+                      </div>
+
+                      {/* Word & suffix */}
+                      <div className="d-flex align-items-baseline gap-2 flex-wrap">
+                        <span style={{ fontSize: "1.15rem", fontWeight: 700, color: "var(--text)", letterSpacing: "0.02em" }}>
+                          <strong style={{ color: item.color, fontSize: "1.25rem" }}>{item.word.charAt(0)}</strong>
+                          {item.word.slice(1)}
+                        </span>
+                        {item.suffix && (
+                          <span style={{ fontSize: "1rem", fontWeight: 500, color: "var(--text-3)", fontStyle: "italic" }}>
+                            {item.suffix}
+                          </span>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </SectionWrapper>
+
+        {/* 6 Grid Cards for A-E-T-H-E-R Detailed Features */}
+        <SectionWrapper>
+          <div className="row g-4">
+            {ACRONYM_ITEMS.map((item, i) => (
+              <div key={item.word + i} className="col-md-6 col-lg-4">
+                <motion.div
+                  variants={stagger(0.05 * i)}
+                  whileHover={{ y: -6, boxShadow: "var(--shadow-lg)" }}
+                  style={{
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 20,
+                    padding: 24,
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    position: "relative",
+                    overflow: "hidden",
+                    transition: "border-color 0.2s",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = item.color)}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+                >
+                  {/* Subtle top background gradient */}
+                  <div style={{
+                    position: "absolute", top: 0, left: 0, right: 0, height: 100,
+                    background: item.bgGradient,
+                    pointerEvents: "none",
+                    opacity: 0.8,
+                  }} />
+
+                  <div className="d-flex align-items-center justify-content-between mb-3" style={{ position: "relative", zIndex: 1 }}>
+                    <div style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 12,
+                      background: "var(--bg-card)",
+                      border: `1px solid ${item.borderColor}`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      boxShadow: "var(--shadow-sm)",
+                    }}>
+                      {item.icon}
+                    </div>
+
+                    <span style={{
+                      fontSize: "1.4rem",
+                      fontWeight: 800,
+                      fontFamily: "JetBrains Mono, monospace",
+                      color: item.color,
+                      opacity: 0.9,
+                    }}>
+                      {item.letter}
+                    </span>
+                  </div>
+
+                  <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column" }}>
+                    <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>
+                      <span style={{ color: item.color, fontWeight: 800 }}>{item.word.charAt(0)}</span>
+                      {item.word.slice(1)} {item.suffix}
+                    </h4>
+                    <p style={{ fontSize: "0.84rem", lineHeight: 1.6, color: "var(--text-3)", margin: 0 }}>
+                      {item.description}
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
+            ))}
+          </div>
+        </SectionWrapper>
       </div>
     </section>
   );
@@ -1258,6 +1575,7 @@ export default function LandingPage() {
       <Navbar dark={dark} setDark={setDark} lang={lang} setLang={setLang} dict={dict} />
       <main style={{ paddingTop: 0 }}>
         <HeroSection dict={dict} />
+        <AetherMeaningSection dict={dict} />
         <PillarsSection dict={dict} />
         <CurriculumSection dict={dict} />
         <WorkflowSection dict={dict} />

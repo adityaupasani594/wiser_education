@@ -18,6 +18,7 @@ export type T = typeof TRANSLATIONS.en;
 const TRANSLATIONS = {
   en: {
     // ── Navbar ──
+    nav_about: "About AETHER",
     nav_curriculum: "Curriculum",
     nav_workflow: "Lab Workflow",
     nav_credentials: "Credentials",
@@ -124,6 +125,7 @@ const TRANSLATIONS = {
   },
 
   hi: {
+    nav_about: "AETHER के बारे में",
     nav_curriculum: "पाठ्यक्रम",
     nav_workflow: "लैब वर्कफ़्लो",
     nav_credentials: "प्रमाण-पत्र",
@@ -216,6 +218,7 @@ const TRANSLATIONS = {
   },
 
   kn: {
+    nav_about: "AETHER ಬಗ್ಗೆ",
     nav_curriculum: "ಪಠ್ಯಕ್ರಮ",
     nav_workflow: "ಲ್ಯಾಬ್ ವರ್ಕ್‌ಫ್ಲೋ",
     nav_credentials: "ಪ್ರಮಾಣಪತ್ರ",
@@ -308,6 +311,7 @@ const TRANSLATIONS = {
   },
 
   ta: {
+    nav_about: "AETHER பற்றி",
     nav_curriculum: "பாடத்திட்டம்",
     nav_workflow: "ஆய்வக பணிப்பாய்வு",
     nav_credentials: "சான்றிதழ்கள்",
@@ -400,6 +404,7 @@ const TRANSLATIONS = {
   },
 
   es: {
+    nav_about: "Acerca de AETHER",
     nav_curriculum: "Plan de estudios",
     nav_workflow: "Flujo del laboratorio",
     nav_credentials: "Credenciales",
@@ -492,6 +497,7 @@ const TRANSLATIONS = {
   },
 
   fr: {
+    nav_about: "À propos d'AETHER",
     nav_curriculum: "Programme",
     nav_workflow: "Flux du laboratoire",
     nav_credentials: "Accréditations",
