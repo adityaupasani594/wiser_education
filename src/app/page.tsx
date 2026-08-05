@@ -1490,6 +1490,7 @@ function CTAFooter({ dict }: { dict: any }) {
                   {dict.footer_resources}
                 </p>
                 {[
+                  { label: dict.footer_link_references, href: "https://docs.google.com/document/d/1vdsl_hcsILdID1FQ_VcxUTCvPo9eidVq-4q3GoLPceI/edit?usp=sharing" },
                   { label: dict.footer_link_qiskit, href: "https://docs.quantum.ibm.com" },
                   { label: dict.footer_link_github, href: "https://github.com/adityaupasani594/wiser_education" },
                   { label: dict.footer_link_ibm, href: "https://quantum.ibm.com" },
