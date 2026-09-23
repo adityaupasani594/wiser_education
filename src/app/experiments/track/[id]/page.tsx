@@ -496,7 +496,7 @@ export default function TrackDetailPage() {
       realWorld: "Quantum teleportation is the core routing protocol for the quantum internet, enabling entanglement distribution networks between distributed servers for secure quantum computing clusters.",
       exps: [
         { id: "2.1", title: dict.t2_e1, status: "In Progress" },
-        { id: "2.2", title: dict.t2_e2, status: "Locked" }
+        { id: "2.2", title: dict.t2_e2, status: "Not Started" }
       ],
       interactiveWidget: <TeleportFlow />
     },
@@ -514,8 +514,8 @@ export default function TrackDetailPage() {
       mathBody: "Photons are sent polarized in two non-orthogonal bases: Rectilinear (+: |0⟩, |1⟩) and Diagonal (x: |+⟩, |-⟩). Measuring a diagonal state |+⟩ = (|0⟩+|1⟩)/√2 in a rectilinear basis yields either |0⟩ or |1⟩ with 50% probability, introducing a Quantum Bit Error Rate (QBER) of 25% if Eve attempts to eavesdrop.",
       realWorld: "QKD is active today in secure governmental communications, banking channels, and satellite quantum networks (such as China's Micius satellite, linking Beijing to Vienna).",
       exps: [
-        { id: "3.1", title: dict.t3_e1, status: "Locked" },
-        { id: "3.2", title: dict.t3_e2, status: "Locked" }
+        { id: "3.1", title: dict.t3_e1, status: "Not Started" },
+        { id: "3.2", title: dict.t3_e2, status: "Not Started" }
       ],
       interactiveWidget: <PolarizationGame />
     },

@@ -58,7 +58,7 @@ const EXPERIMENTS_DATA = (dict: any): Experiment[] => [
     difficulty: "Intermediate",
     duration: "30 mins",
     concepts: dict.t2_c,
-    status: "Locked"
+    status: "Not Started"
   },
   {
     id: "3.1",

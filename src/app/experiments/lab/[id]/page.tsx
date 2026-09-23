@@ -1409,12 +1409,22 @@ export default function LabWorkspacePage() {
     loadProfileName();
   }, [user, authLoading]);
 
-  // Fetch progress and check if current lab is unlocked/completed on mount
+  // Fetch progress and check if current lab is completed/in progress on mount
   useEffect(() => {
     async function checkLabStatus() {
       if (authLoading) return;
       if (!user) {
-        setLabStatus("Locked");
+        // Fast fallback from localStorage cache for guest
+        try {
+          const cached = localStorage.getItem(`lab_completed_guest_${idStr}`);
+          if (cached === "Completed") {
+            setLabStatus("Completed");
+            setQuizPassed(true);
+            setQuizSubmitted(true);
+            return;
+          }
+        } catch (e) {}
+        setLabStatus("In Progress");
         return;
       }
 
@@ -1470,8 +1480,7 @@ export default function LabWorkspacePage() {
         }
       } catch (err) {
         console.error("Error loading lab status:", err);
-        if (idStr === "1.1") setLabStatus("In Progress");
-        else setLabStatus("Locked");
+        setLabStatus("In Progress");
       }
     }
     checkLabStatus();
@@ -1863,8 +1872,16 @@ export default function LabWorkspacePage() {
   };
 
   const saveLabCompletion = async (labId: string) => {
-    if (!user) return;
     try {
+      if (!user) {
+        try {
+          localStorage.setItem(`lab_completed_guest_${labId}`, "Completed");
+        } catch (e) {}
+        setLabStatus("Completed");
+        setQuizPassed(true);
+        setQuizSubmitted(true);
+        return;
+      }
       const progressDocRef = doc(db, "progress", user.uid);
       const progressDocSnap = await getDoc(progressDocRef);
       let statuses: Record<string, string> = {
@@ -2308,57 +2325,6 @@ ${svgCircuit}
     );
   }
 
-  if (labStatus === "Locked") {
-    return (
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        background: "radial-gradient(circle at 50% 50%, #0c0f1c 0%, #05060b 100%)",
-        color: "var(--text, #ffffff)",
-        fontFamily: "'Inter', sans-serif",
-        padding: 24
-      }}>
-        <div style={{
-          maxWidth: 480,
-          width: "100%",
-          background: "rgba(15, 23, 42, 0.55)",
-          border: "1px solid rgba(255, 255, 255, 0.05)",
-          borderRadius: 24,
-          padding: "48px 32px",
-          textAlign: "center",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)"
-        }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: "50%", background: "rgba(239, 68, 68, 0.08)",
-            border: "1px solid rgba(239, 68, 68, 0.2)", display: "flex", alignItems: "center",
-            justifyContent: "center", margin: "0 auto 24px"
-          }}>
-            <Lock size={28} color="#ef4444" />
-          </div>
-
-          <h3 style={{ fontSize: "1.4rem", fontWeight: 800, marginBottom: 12 }}>
-            Lab Module Locked
-          </h3>
-
-          <p style={{ fontSize: "0.88rem", color: "var(--text-3, #888)", lineHeight: 1.6, marginBottom: 32 }}>
-            {idStr === "1.2"
-              ? "You must complete Qubit States & Rotations (Experiment 1.1) before unlocking this entanglement lab."
-              : "To access this advanced lab, you must first complete the baseline requirements: Experiment 1.1 (Qubit Basics) and Experiment 1.2 (Qubit Entanglement)."}
-          </p>
-
-          <Link href="/experiments" className="btn-primary-wiser d-inline-flex align-items-center gap-2" style={{ textDecoration: "none", margin: "0 auto" }}>
-            <Compass size={16} />
-            <span>Return to Dashboard</span>
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   if (idStr === "1.1") {
     return <QuantumBasics dark={dark} setDark={setDark} lang={lang} setLang={setLang} onQuizPassed={() => saveLabCompletion("1.1")} initialCompleted={labStatus === "Completed"} userName={profileName} userId={user?.uid || ""} />;
