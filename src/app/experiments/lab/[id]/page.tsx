@@ -2381,7 +2381,7 @@ ${svgCircuit}
                   <option value={7}>7. Photon Loss &amp; Fiber Transmission</option>
                   <option value={8}>8. Fiber Distance &amp; Attenuation Limits</option>
                   <option value={9}>9. Decoy State Protocol vs PNS Attacks</option>
-                  <option value={10}>10. Man-in-in-the-Middle &amp; Authentication Attacks</option>
+                  <option value={10}>10. Man-in-the-Middle &amp; Authentication Attacks</option>
                 </select>
               </div>
             </div>
